@@ -44,7 +44,7 @@ class UpgoScreen extends StatelessWidget {
       appBar: AppBar(title: Text('업고')),
       body: Center(child: Text('업고 화면')),
       
-      // ✅ 하단 우측 플로팅 버튼
+      
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showStoreOptions(context),
         backgroundColor: Colors.black,

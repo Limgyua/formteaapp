@@ -4,8 +4,9 @@ import 'screens/used_screen.dart';
 import 'upgo_screen.dart';
 import 'shopping_screen.dart';
 
-// 로그인 상태를 앱 전체에서 공유
+// 로그인 상태와 사용자 이름을 앱 전체에서 공유
 ValueNotifier<bool> isLoggedIn = ValueNotifier<bool>(false);
+ValueNotifier<String?> userName = ValueNotifier<String?>(null);
 
 void main() => runApp(MyApp());
 
@@ -35,6 +36,47 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+     
+      drawer: FractionallySizedBox(
+        widthFactor: 0.7,
+        child: Drawer(
+          child: SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 32.0),
+                  child: ValueListenableBuilder<bool>(
+                    valueListenable: isLoggedIn,
+                    builder: (context, loggedIn, _) {
+                      if (loggedIn) {
+                        return ValueListenableBuilder<String?>(
+                          valueListenable: userName,
+                          builder: (context, name, _) {
+                            return Text(
+                              name != null ? '$name님' : '',
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            );
+                          },
+                        );
+                      } else {
+                        return Text(
+                          '로그인 해주세요',
+                          style: TextStyle(fontSize: 18, color: Colors.grey),
+                        );
+                      }
+                    },
+                  ),
+                ),
+                Divider(thickness: 1, height: 1, color: Colors.grey[300]),
+              ],
+            ),
+          ),
+        ),
+      ),
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -47,13 +89,20 @@ class _HomeScreenState extends State<HomeScreen> {
             fontSize: 20,
           ),
         ),
-        leading: Icon(Icons.menu, color: Colors.black),
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: Icon(Icons.menu, color: Colors.black),
+            onPressed: () {
+              Scaffold.of(context).openDrawer();
+            },
+          ),
+        ),
         actions: [
           ValueListenableBuilder<bool>(
             valueListenable: isLoggedIn,
             builder: (context, loggedIn, _) {
               if (loggedIn) {
-                // 로그인 상태: 로그아웃 아이콘
+               
                 return IconButton(
                   icon: Icon(Icons.logout, color: Colors.black),
                   tooltip: '로그아웃',
@@ -77,6 +126,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     );
                     if (result == true) {
                       isLoggedIn.value = false;
+                      userName.value = null;
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('로그아웃 되었습니다.')),
                       );
@@ -84,7 +134,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                 );
               } else {
-                // 비로그인 상태: 로그인 아이콘
+               
                 return IconButton(
                   icon: Icon(Icons.person_outline, color: Colors.black),
                   onPressed: () {
@@ -105,7 +155,7 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16),
           child: Column(
             children: [
-              SizedBox(height: 20), // 상단 여백
+              SizedBox(height: 20), 
 
               // 검색창
               Container(
@@ -129,7 +179,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-              SizedBox(height: 100), // 검색창과 로고 사이 간격
+              SizedBox(height: 100), 
 
               SizedBox(
                 height: 320,
@@ -156,7 +206,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Navigator.push(context,
                           MaterialPageRoute(builder: (_) => UsedScreen()));
                     }
-                    verticalDragDistance = 0; // 초기화
+                    verticalDragDistance = 0;
                   },
                   child: Center(
                     child: Stack(

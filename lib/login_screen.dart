@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../db_helper.dart';
 import 'signup_screen.dart';
-import 'main.dart'; // isLoggedIn, HomeScreen import
+import 'main.dart'; 
 
 class LoginScreen extends StatelessWidget {
   final TextEditingController usernameController = TextEditingController();
@@ -28,13 +28,35 @@ class LoginScreen extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  'GATE ai',
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
+                
+                ValueListenableBuilder<bool>(
+                  valueListenable: isLoggedIn,
+                  builder: (context, loggedIn, _) {
+                    if (loggedIn) {
+                      return ValueListenableBuilder<String?>(
+                        valueListenable: userName,
+                        builder: (context, name, _) {
+                          return Text(
+                            name != null ? '$name님 안녕하세요' : '',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          );
+                        },
+                      );
+                    } else {
+                      return Text(
+                        'GATE ai',
+                        style: TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      );
+                    }
+                  },
                 ),
                 SizedBox(height: 40),
                 TextField(
@@ -82,11 +104,12 @@ class LoginScreen extends StatelessWidget {
                       final user = await DBHelper.loginUser(username, password);
 
                       if (user != null) {
-                        isLoggedIn.value = true; // 로그인 상태 true로 변경
+                        isLoggedIn.value = true; 
+                        userName.value = user['name']; 
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('${user['name']}님, 환영합니다!')),
                         );
-                        // 로그인 성공 시 메인화면으로 이동
+                        
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(builder: (_) => HomeScreen()),

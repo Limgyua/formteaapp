@@ -20,7 +20,7 @@ final List<String> cities = [
   '제주특별자치도',
 ];
 
-// 구/군/읍/면/동 데이터 (간단 예시)
+// 구/군/읍/면/동 데이터
 final Map<String, List<String>> subRegions = {
   '서울특별시': ['강남구', '강동구', '강북구', '강서구', '관악구'],
   '인천광역시': ['부평구', '계양구', '서구', '연수구', '남동구'],
@@ -115,7 +115,7 @@ class _RegionSelectScreenState extends State<RegionSelectScreen> {
                   return ListTile(
                     title: Text(subRegion),
                     onTap: () {
-                      // 선택한 시/도 + 구/군/동 값 전달하며 종료
+                     
                       Navigator.pop(context, '$selectedCity $subRegion');
                     },
                   );
