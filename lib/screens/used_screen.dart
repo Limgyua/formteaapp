@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../region_select_screen.dart';
 
-// 각 카테고리 화면 import
 import 'category/furniture_screen.dart'; 
 import 'category/clothes_screen.dart';
 import 'category/electronics_screen.dart';
@@ -16,7 +15,7 @@ import 'category/book_screen.dart';
 import 'category/daily_items_screen.dart';
 import 'category/etc_screen.dart';
 
-// 가상 매장 관련 화면 import
+
 import '../store/store_setup_screen.dart';
 import '../store/my_store_manage_screen.dart';
 
