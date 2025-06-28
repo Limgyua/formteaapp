@@ -15,8 +15,10 @@ import 'category/book_screen.dart';
 import 'category/daily_items_screen.dart';
 
 class UsedScreen extends StatefulWidget {
+  const UsedScreen({super.key}); // const 생성자 및 super.key
+
   @override
-  _UsedScreenState createState() => _UsedScreenState();
+  State<UsedScreen> createState() => _UsedScreenState();
 }
 
 class _UsedScreenState extends State<UsedScreen> {
@@ -26,23 +28,23 @@ class _UsedScreenState extends State<UsedScreen> {
   String currentLocation = '부평동';
 
   final List<Map<String, dynamic>> customCategories = [
-    {'name': '가구', 'icon': Icons.chair, 'color': Colors.brown, 'screen': FurnitureScreen()},
-    {'name': '의류', 'icon': Icons.checkroom, 'color': Colors.pink, 'screen': ClothingScreen()},
-    {'name': '전자제품', 'icon': Icons.tv, 'color': Colors.blue, 'screen': ElectronicsScreen()},
-    {'name': '유아용품', 'icon': Icons.child_friendly, 'color': Colors.orange, 'screen': BabyScreen()},
-    {'name': '생활용품', 'icon': Icons.kitchen, 'color': Colors.green, 'screen': LivingScreen()},
-    {'name': '스포츠/레저', 'icon': Icons.sports_soccer, 'color': Colors.deepPurple, 'screen': SportsScreen()},
-    {'name': '식품', 'icon': Icons.fastfood, 'color': Colors.red, 'screen': FoodScreen()},
-    {'name': '반려동물', 'icon': Icons.pets, 'color': Colors.teal, 'screen': PetScreen()},
-    {'name': '자전거', 'icon': Icons.directions_bike, 'color': Colors.indigo, 'screen': BikeScreen()},
-    {'name': '도서', 'icon': Icons.menu_book, 'color': Colors.deepOrange, 'screen': BookScreen()},
-    {'name': '게임/취미', 'icon': Icons.videogame_asset, 'color': Colors.purple, 'screen': GameScreen()},
+    {'name': '가구', 'icon': Icons.chair, 'color': Colors.brown, 'screen': const FurnitureScreen()},
+    {'name': '의류', 'icon': Icons.checkroom, 'color': Colors.pink, 'screen': const ClothingScreen()},
+    {'name': '전자제품', 'icon': Icons.tv, 'color': Colors.blue, 'screen': const ElectronicsScreen()},
+    {'name': '유아용품', 'icon': Icons.child_friendly, 'color': Colors.orange, 'screen': const BabyScreen()},
+    {'name': '생활용품', 'icon': Icons.kitchen, 'color': Colors.green, 'screen': const LivingScreen()},
+    {'name': '스포츠/레저', 'icon': Icons.sports_soccer, 'color': Colors.deepPurple, 'screen': const SportsScreen()},
+    {'name': '식품', 'icon': Icons.fastfood, 'color': Colors.red, 'screen': const FoodScreen()},
+    {'name': '반려동물', 'icon': Icons.pets, 'color': Colors.teal, 'screen': const PetScreen()},
+    {'name': '자전거', 'icon': Icons.directions_bike, 'color': Colors.indigo, 'screen': const BikeScreen()},
+    {'name': '도서', 'icon': Icons.menu_book, 'color': Colors.deepOrange, 'screen': const BookScreen()},
+    {'name': '게임/취미', 'icon': Icons.videogame_asset, 'color': Colors.purple, 'screen': const GameScreen()},
   ];
 
   @override
   void initState() {
     super.initState();
-    _timer = Timer.periodic(Duration(seconds: 3), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
       setState(() {
         currentCategoryIndex = (currentCategoryIndex + 1) % categories.length;
       });
@@ -69,7 +71,6 @@ class _UsedScreenState extends State<UsedScreen> {
       });
     }
   }
-  
 
   @override
   Widget build(BuildContext context) {
@@ -81,21 +82,21 @@ class _UsedScreenState extends State<UsedScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('중고', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+            const Text('중고', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
             TextButton.icon(
               onPressed: _selectLocation,
-              icon: Icon(Icons.location_on, color: Colors.black, size: 18),
-              label: Text('위치 변경', style: TextStyle(color: Colors.black)),
+              icon: const Icon(Icons.location_on, color: Colors.black, size: 18),
+              label: const Text('위치 변경', style: TextStyle(color: Colors.black)),
               style: TextButton.styleFrom(
                 backgroundColor: Colors.white,
-                side: BorderSide(color: Colors.black, width: 1),
-                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                side: const BorderSide(color: Colors.black, width: 1),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),
@@ -108,36 +109,36 @@ class _UsedScreenState extends State<UsedScreen> {
       ),
 
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                Icon(Icons.location_on, color: Colors.black),
-                SizedBox(width: 6),
+                const Icon(Icons.location_on, color: Colors.black),
+                const SizedBox(width: 6),
                 Text(
                   '$currentLocation 에서',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
                 ),
               ],
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Text(
               '「$currentCategory」 찾고 계신가요?',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87),
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87),
             ),
-            SizedBox(height: 24),
-            Text(
+            const SizedBox(height: 24),
+            const Text(
               '⏳ 중고상품 리스트 UI는 이 아래에 붙일 수 있어요!',
               style: TextStyle(color: Colors.grey),
             ),
-            SizedBox(height: 32),
-            Text(
+            const SizedBox(height: 32),
+            const Text(
               '카테고리',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Wrap(
               spacing: 12,
               runSpacing: 12,
@@ -151,7 +152,7 @@ class _UsedScreenState extends State<UsedScreen> {
                   },
                   child: Container(
                     width: 100,
-                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
                     decoration: BoxDecoration(
                       color: category['color'].withOpacity(0.1),
                       borderRadius: BorderRadius.circular(16),
@@ -159,7 +160,7 @@ class _UsedScreenState extends State<UsedScreen> {
                         BoxShadow(
                           color: category['color'].withOpacity(0.3),
                           blurRadius: 4,
-                          offset: Offset(2, 2),
+                          offset: const Offset(2, 2),
                         ),
                       ],
                       border: Border.all(color: category['color']),
@@ -172,10 +173,10 @@ class _UsedScreenState extends State<UsedScreen> {
                           size: 28,
                           color: category['color'],
                         ),
-                        SizedBox(height: 6),
+                        const SizedBox(height: 6),
                         Text(
                           category['name'],
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
                             color: Colors.black87,

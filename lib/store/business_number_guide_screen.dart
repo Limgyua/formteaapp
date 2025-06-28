@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
 class BusinessNumberGuideScreen extends StatelessWidget {
+  const BusinessNumberGuideScreen({super.key}); // key 파라미터 및 const 생성자
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('가이드입니다. 여기를 클릭해주세요.'),
+        title: const Text('가이드입니다. 여기를 클릭해주세요.'),
         backgroundColor: Colors.black,
       ),
       body: Center(

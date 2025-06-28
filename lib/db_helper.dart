@@ -36,4 +36,40 @@ class DBHelper {
     }
     return null;
   }
+
+  static Future<Map<String, dynamic>?> getUserByUsername(String username) async {
+    final db = await DBHelper.database();
+    final result = await db.query(
+      'users',
+      where: 'username = ?',
+      whereArgs: [username],
+    );
+    if (result.isNotEmpty) {
+      return result.first;
+    }
+    return null;
+  }
+
+  static Future<void> updateUser(Map<String, dynamic> user) async {
+    final db = await DBHelper.database();
+    await db.update(
+      'users',
+      {
+        'name': user['name'],
+        'birth': user['birth'],
+        'password': user['password'],
+      },
+      where: 'id = ?',
+      whereArgs: [user['id']],
+    );
+  }
+
+  static Future<void> deleteUser(int id) async {
+    final db = await DBHelper.database();
+    await db.delete(
+      'users',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
 }

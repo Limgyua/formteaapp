@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'business_number_guide_screen.dart'; // 가이드 페이지 import
 
 class StoreSetupScreen extends StatefulWidget {
+  const StoreSetupScreen({super.key}); // const 생성자 및 super.key
+
   @override
-  _StoreSetupScreenState createState() => _StoreSetupScreenState();
+  State<StoreSetupScreen> createState() => _StoreSetupScreenState();
 }
 
 class _StoreSetupScreenState extends State<StoreSetupScreen> {
@@ -40,21 +42,22 @@ class _StoreSetupScreenState extends State<StoreSetupScreen> {
   Widget build(BuildContext context) {
     int storeSizePrice = storeSizes[selectedStoreSize] ?? 0;
     int signboardPrice = signboards[selectedSignboard] ?? 0;
-    int totalPrice = storeSizePrice + signboardPrice + (showAdBanner ? adBannerPrice : 0);
+    int totalPrice =
+        storeSizePrice + signboardPrice + (showAdBanner ? adBannerPrice : 0);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('개인 매장 개설하기'),
+        title: const Text('개인 매장 개설하기'),
         backgroundColor: Colors.black,
       ),
       body: Padding(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Form(
           key: _formKey,
           child: ListView(
             children: [
               TextFormField(
-                decoration: InputDecoration(labelText: '매장 이름'),
+                decoration: const InputDecoration(labelText: '매장 이름'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return '매장 이름을 입력하세요';
@@ -63,9 +66,9 @@ class _StoreSetupScreenState extends State<StoreSetupScreen> {
                 },
                 onSaved: (value) => storeName = value ?? '',
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               TextFormField(
-                decoration: InputDecoration(labelText: '사업자 등록번호'),
+                decoration: const InputDecoration(labelText: '사업자 등록번호'),
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -78,7 +81,7 @@ class _StoreSetupScreenState extends State<StoreSetupScreen> {
                 },
                 onSaved: (value) => businessNumber = value ?? '',
               ),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
 
               // 가이드 작은 글씨 버튼
               Align(
@@ -87,10 +90,11 @@ class _StoreSetupScreenState extends State<StoreSetupScreen> {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => BusinessNumberGuideScreen()),
+                      MaterialPageRoute(
+                          builder: (_) => const BusinessNumberGuideScreen()),
                     );
                   },
-                  child: Text(
+                  child: const Text(
                     'GATE ai 사업자 쇼핑몰 가이드 >',
                     style: TextStyle(
                       fontSize: 12,
@@ -101,12 +105,15 @@ class _StoreSetupScreenState extends State<StoreSetupScreen> {
                 ),
               ),
 
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
 
-              Text('매장 크기 선택 (가격 단위: 원)', style: TextStyle(fontWeight: FontWeight.bold)),
+              const Text('매장 크기 선택 (가격 단위: 원)',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              // 매장 크기 선택 부분
               ...storeSizes.entries.map((entry) {
                 return RadioListTile<String>(
-                  title: Text('${entry.key} (${entry.value == 0 ? "무료" : "${entry.value}원"})'),
+                  title: Text(
+                      '${entry.key} (${entry.value == 0 ? "무료" : "${entry.value}원"})'),
                   value: entry.key,
                   groupValue: selectedStoreSize,
                   onChanged: (value) {
@@ -115,13 +122,12 @@ class _StoreSetupScreenState extends State<StoreSetupScreen> {
                     });
                   },
                 );
-              }).toList(),
-
-              SizedBox(height: 24),
-              Text('간판 디자인 선택 (가격 단위: 원)', style: TextStyle(fontWeight: FontWeight.bold)),
+              }),
+// 간판 디자인 선택 부분도 동일하게!
               ...signboards.entries.map((entry) {
                 return RadioListTile<String>(
-                  title: Text('${entry.key} (${entry.value == 0 ? "무료" : "${entry.value}원"})'),
+                  title: Text(
+                      '${entry.key} (${entry.value == 0 ? "무료" : "${entry.value}원"})'),
                   value: entry.key,
                   groupValue: selectedSignboard,
                   onChanged: (value) {
@@ -130,11 +136,11 @@ class _StoreSetupScreenState extends State<StoreSetupScreen> {
                     });
                   },
                 );
-              }).toList(),
+              }),
 
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
               CheckboxListTile(
-                title: Text('광고 배너에 노출하기 (2,000원)'),
+                title: const Text('광고 배너에 노출하기 (2,000원)'),
                 value: showAdBanner,
                 onChanged: (value) {
                   setState(() {
@@ -143,22 +149,23 @@ class _StoreSetupScreenState extends State<StoreSetupScreen> {
                 },
               ),
 
-              SizedBox(height: 24),
-              Text('총 예상 비용: $totalPrice 원', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 24),
+              Text('총 예상 비용: $totalPrice 원',
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold)),
 
-              SizedBox(height: 32),
+              const SizedBox(height: 32),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
-                child: Text('개설 신청'),
+                child: const Text('개설 신청'),
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
                     _formKey.currentState!.save();
 
-                    // TODO: 실제 서버 연동 로직 작성
                     showDialog(
                       context: context,
                       builder: (_) => AlertDialog(
-                        title: Text('신청 완료'),
+                        title: const Text('신청 완료'),
                         content: Text('매장 개설 신청이 접수되었습니다.\n\n'
                             '매장명: $storeName\n'
                             '사업자번호: $businessNumber\n'
@@ -172,7 +179,7 @@ class _StoreSetupScreenState extends State<StoreSetupScreen> {
                               Navigator.pop(context); // 다이얼로그 닫기
                               Navigator.pop(context); // 화면 닫기
                             },
-                            child: Text('확인'),
+                            child: const Text('확인'),
                           ),
                         ],
                       ),

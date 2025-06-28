@@ -30,14 +30,14 @@ final Map<String, List<String>> subRegions = {
 };
 
 class RegionSelectScreen extends StatefulWidget {
-  const RegionSelectScreen({Key? key}) : super(key: key);
+  const RegionSelectScreen({super.key}); // ← 최신 스타일
 
   @override
   State<RegionSelectScreen> createState() => _RegionSelectScreenState();
 }
 
 class _RegionSelectScreenState extends State<RegionSelectScreen> {
-  String selectedCity = cities[0];  // 기본 선택 시/도
+  String selectedCity = cities[0]; // 기본 선택 시/도
 
   @override
   Widget build(BuildContext context) {
@@ -75,13 +75,15 @@ class _RegionSelectScreenState extends State<RegionSelectScreen> {
                     });
                   },
                   child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 18, horizontal: 20),
                     color: isSelected ? Colors.grey.shade300 : Colors.white,
                     child: Row(
                       children: [
                         Icon(
                           Icons.location_city,
-                          color: isSelected ? Colors.grey.shade700 : Colors.grey,
+                          color:
+                              isSelected ? Colors.grey.shade700 : Colors.grey,
                           size: 20,
                         ),
                         const SizedBox(width: 10),
@@ -90,8 +92,12 @@ class _RegionSelectScreenState extends State<RegionSelectScreen> {
                             city,
                             style: TextStyle(
                               fontSize: 16,
-                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                              color: isSelected ? Colors.grey.shade700 : Colors.black87,
+                              fontWeight: isSelected
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
+                              color: isSelected
+                                  ? Colors.grey.shade700
+                                  : Colors.black87,
                             ),
                           ),
                         ),
@@ -115,7 +121,6 @@ class _RegionSelectScreenState extends State<RegionSelectScreen> {
                   return ListTile(
                     title: Text(subRegion),
                     onTap: () {
-                     
                       Navigator.pop(context, '$selectedCity $subRegion');
                     },
                   );

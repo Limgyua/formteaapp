@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import '../db_helper.dart';
 
 class SignupScreen extends StatefulWidget {
+  const SignupScreen({super.key}); // const 생성자 및 super.key
+
   @override
-  _SignupScreenState createState() => _SignupScreenState();
+  State<SignupScreen> createState() => _SignupScreenState();
 }
 
 class _SignupScreenState extends State<SignupScreen> {
@@ -13,7 +15,8 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
 
   bool agreeAll = false;
   bool agree14 = false;
@@ -30,13 +33,13 @@ class _SignupScreenState extends State<SignupScreen> {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
             child: ConstrainedBox(
               constraints: BoxConstraints(maxWidth: maxWidth),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(
+                  const Text(
                     '회원가입',
                     textAlign: TextAlign.center,
                     style: TextStyle(
@@ -45,25 +48,31 @@ class _SignupScreenState extends State<SignupScreen> {
                       color: Colors.black,
                     ),
                   ),
-                  SizedBox(height: 32),
+                  const SizedBox(height: 32),
                   buildLabel('이름'),
                   buildTextField(controller: nameController, hint: '이름 입력'),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   buildLabel('생년월일 (YYYYMMDD)'),
-                  buildTextField(controller: birthController, hint: '예) 19900101', keyboardType: TextInputType.number),
-                  SizedBox(height: 16),
+                  buildTextField(
+                      controller: birthController,
+                      hint: '예) 19900101',
+                      keyboardType: TextInputType.number),
+                  const SizedBox(height: 16),
                   buildLabel('연락처'),
                   Row(
                     children: [
                       Expanded(
                         flex: 2,
-                        child: buildTextField(controller: phoneController, hint: '연락처 입력', keyboardType: TextInputType.phone),
+                        child: buildTextField(
+                            controller: phoneController,
+                            hint: '연락처 입력',
+                            keyboardType: TextInputType.phone),
                       ),
-                      SizedBox(width: 8),
+                      const SizedBox(width: 8),
                       Expanded(
                         child: ElevatedButton(
                           onPressed: () {
-                            print("인증번호 전송");
+                            // 인증번호 전송 로직
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.black,
@@ -72,26 +81,37 @@ class _SignupScreenState extends State<SignupScreen> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(4),
                             ),
-                            padding: EdgeInsets.symmetric(vertical: 14),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
-                          child: Text("인증", style: TextStyle(fontWeight: FontWeight.bold)),
+                          child: const Text("인증",
+                              style: TextStyle(fontWeight: FontWeight.bold)),
                         ),
                       )
                     ],
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   buildLabel('이메일'),
-                  buildTextField(controller: emailController, hint: '이메일 입력', keyboardType: TextInputType.emailAddress),
-                  SizedBox(height: 16),
+                  buildTextField(
+                      controller: emailController,
+                      hint: '이메일 입력',
+                      keyboardType: TextInputType.emailAddress),
+                  const SizedBox(height: 16),
                   buildLabel('아이디'),
-                  buildTextField(controller: usernameController, hint: '아이디 입력'),
-                  SizedBox(height: 16),
+                  buildTextField(
+                      controller: usernameController, hint: '아이디 입력'),
+                  const SizedBox(height: 16),
                   buildLabel('비밀번호'),
-                  buildTextField(controller: passwordController, hint: '비밀번호 입력', obscure: true),
-                  SizedBox(height: 16),
+                  buildTextField(
+                      controller: passwordController,
+                      hint: '비밀번호 입력',
+                      obscure: true),
+                  const SizedBox(height: 16),
                   buildLabel('비밀번호 확인'),
-                  buildTextField(controller: confirmPasswordController, hint: '비밀번호 재입력', obscure: true),
-                  SizedBox(height: 24),
+                  buildTextField(
+                      controller: confirmPasswordController,
+                      hint: '비밀번호 재입력',
+                      obscure: true),
+                  const SizedBox(height: 24),
 
                   // 약관동의
                   buildAgreementCheckbox(
@@ -112,11 +132,15 @@ class _SignupScreenState extends State<SignupScreen> {
                   Divider(color: Colors.grey.shade300),
                   buildAgreementCheckbox(
                     value: agree14,
-                    labelWidget: Row(
+                    labelWidget: const Row(
                       children: [
-                        Text('만 14세 이상입니다', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
+                        Text('만 14세 이상입니다',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black)),
                         SizedBox(width: 4),
-                        Text('(필수)', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                        Text('(필수)',
+                            style: TextStyle(fontSize: 12, color: Colors.grey)),
                       ],
                     ),
                     onChanged: (val) {
@@ -129,11 +153,15 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                   buildAgreementCheckbox(
                     value: agreeTerms,
-                    labelWidget: Row(
+                    labelWidget: const Row(
                       children: [
-                        Text('이용약관', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
+                        Text('이용약관',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black)),
                         SizedBox(width: 4),
-                        Text('(필수)', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                        Text('(필수)',
+                            style: TextStyle(fontSize: 12, color: Colors.grey)),
                       ],
                     ),
                     onChanged: (val) {
@@ -144,11 +172,12 @@ class _SignupScreenState extends State<SignupScreen> {
                       });
                     },
                     trailing: IconButton(
-                      icon: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.black54),
+                      icon: const Icon(Icons.arrow_forward_ios,
+                          size: 16, color: Colors.black54),
                       onPressed: () {
                         showDialog(
                           context: context,
-                          builder: (_) => AgreementDialog(
+                          builder: (_) => const AgreementDialog(
                             title: '이용약관',
                             content: '''1. 서비스 이용에 관한 기본 조건
 2. 회원의 권리와 의무
@@ -162,12 +191,15 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                   buildAgreementCheckbox(
                     value: agreePrivacyMarketing,
-                    labelWidget: Row(
+                    labelWidget: const Row(
                       children: [
                         Text('개인정보 마케팅 활용 동의',
-                            style: TextStyle(fontWeight: FontWeight.normal, color: Colors.black)),
+                            style: TextStyle(
+                                fontWeight: FontWeight.normal,
+                                color: Colors.black)),
                         SizedBox(width: 4),
-                        Text('(선택)', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                        Text('(선택)',
+                            style: TextStyle(fontSize: 12, color: Colors.grey)),
                       ],
                     ),
                     onChanged: (val) {
@@ -178,11 +210,12 @@ class _SignupScreenState extends State<SignupScreen> {
                       });
                     },
                     trailing: IconButton(
-                      icon: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.black54),
+                      icon: const Icon(Icons.arrow_forward_ios,
+                          size: 16, color: Colors.black54),
                       onPressed: () {
                         showDialog(
                           context: context,
-                          builder: (_) => AgreementDialog(
+                          builder: (_) => const AgreementDialog(
                             title: '개인정보 마케팅 활용 동의',
                             content: '''- 수집하는 개인정보 항목
 - 개인정보의 수집 및 이용 목적
@@ -195,12 +228,15 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                   buildAgreementCheckbox(
                     value: agreeReceiveInfo,
-                    labelWidget: Row(
+                    labelWidget: const Row(
                       children: [
                         Text('이벤트, 쿠폰, 특가, 알림 메일 및 SMS 등 수신',
-                            style: TextStyle(fontWeight: FontWeight.normal, color: Colors.black)),
+                            style: TextStyle(
+                                fontWeight: FontWeight.normal,
+                                color: Colors.black)),
                         SizedBox(width: 4),
-                        Text('(선택)', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                        Text('(선택)',
+                            style: TextStyle(fontSize: 12, color: Colors.grey)),
                       ],
                     ),
                     onChanged: (val) {
@@ -211,13 +247,15 @@ class _SignupScreenState extends State<SignupScreen> {
                       });
                     },
                   ),
-                  SizedBox(height: 24),
+                  const SizedBox(height: 24),
                   ElevatedButton(
                     onPressed: agree14 && agreeTerms
                         ? () async {
-                            if (passwordController.text != confirmPasswordController.text) {
+                            if (passwordController.text !=
+                                confirmPasswordController.text) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('비밀번호가 일치하지 않습니다.')),
+                                const SnackBar(
+                                    content: Text('비밀번호가 일치하지 않습니다.')),
                               );
                               return;
                             }
@@ -230,8 +268,11 @@ class _SignupScreenState extends State<SignupScreen> {
                               'password': passwordController.text,
                             };
                             await DBHelper.insertUser(user);
+
+                            if (!context.mounted) return; // ← 이 줄 추가
+
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('회원가입 완료!')),
+                              const SnackBar(content: Text('회원가입 완료!')),
                             );
                             // 회원가입 후 로그인 화면으로 이동
                             Navigator.pushReplacementNamed(context, '/login');
@@ -244,9 +285,11 @@ class _SignupScreenState extends State<SignupScreen> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(6),
                       ),
-                      padding: EdgeInsets.symmetric(vertical: 16),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
-                    child: Text("회원가입", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                    child: const Text("회원가입",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 16)),
                   ),
                 ],
               ),
@@ -259,7 +302,8 @@ class _SignupScreenState extends State<SignupScreen> {
 
   void checkAgreeAll() {
     setState(() {
-      agreeAll = agree14 && agreeTerms && agreePrivacyMarketing && agreeReceiveInfo;
+      agreeAll =
+          agree14 && agreeTerms && agreePrivacyMarketing && agreeReceiveInfo;
     });
   }
 
@@ -268,7 +312,7 @@ class _SignupScreenState extends State<SignupScreen> {
       padding: const EdgeInsets.only(bottom: 6),
       child: Text(
         text,
-        style: TextStyle(
+        style: const TextStyle(
           fontWeight: FontWeight.bold,
           fontSize: 16,
           color: Colors.black87,
@@ -291,8 +335,9 @@ class _SignupScreenState extends State<SignupScreen> {
         filled: true,
         fillColor: Colors.grey.shade100,
         hintText: hint,
-        hintStyle: TextStyle(color: Colors.grey[500]),
-        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+        hintStyle: const TextStyle(color: Colors.grey),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(6),
           borderSide: BorderSide(color: Colors.grey.shade300),
@@ -303,7 +348,7 @@ class _SignupScreenState extends State<SignupScreen> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(6),
-          borderSide: BorderSide(color: Colors.black),
+          borderSide: const BorderSide(color: Colors.black),
         ),
       ),
     );
@@ -330,7 +375,7 @@ class _SignupScreenState extends State<SignupScreen> {
         ),
       );
     } else {
-      effectiveLabel = SizedBox.shrink();
+      effectiveLabel = const SizedBox.shrink();
     }
 
     return Padding(
@@ -340,7 +385,8 @@ class _SignupScreenState extends State<SignupScreen> {
           Checkbox(
             value: value,
             onChanged: onChanged,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
           ),
           Expanded(child: effectiveLabel),
           if (trailing != null) trailing,
@@ -354,18 +400,20 @@ class AgreementDialog extends StatelessWidget {
   final String title;
   final String content;
 
-  AgreementDialog({required this.title, required this.content});
+  const AgreementDialog(
+      {required this.title, required this.content, super.key});
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
+      title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
       content: SingleChildScrollView(
-        child: Text(content, style: TextStyle(fontSize: 14, color: Colors.black87)),
+        child: Text(content,
+            style: const TextStyle(fontSize: 14, color: Colors.black87)),
       ),
       actions: [
         TextButton(
-          child: Text('닫기'),
+          child: const Text('닫기'),
           onPressed: () => Navigator.of(context).pop(),
         )
       ],

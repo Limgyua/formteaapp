@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import '../db_helper.dart';
 import 'signup_screen.dart';
-import 'main.dart'; 
+import 'main.dart';
 
 class LoginScreen extends StatelessWidget {
-  final TextEditingController usernameController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+  const LoginScreen({super.key});
+
+  static final TextEditingController usernameController =
+      TextEditingController();
+  static final TextEditingController passwordController =
+      TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +19,7 @@ class LoginScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.home, color: Colors.black),
+          icon: const Icon(Icons.home, color: Colors.black),
           onPressed: () {
             Navigator.of(context).pop();
           },
@@ -24,11 +28,10 @@ class LoginScreen extends StatelessWidget {
       body: SafeArea(
         child: Center(
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 32),
+            padding: const EdgeInsets.symmetric(horizontal: 32),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                
                 ValueListenableBuilder<bool>(
                   valueListenable: isLoggedIn,
                   builder: (context, loggedIn, _) {
@@ -38,7 +41,7 @@ class LoginScreen extends StatelessWidget {
                         builder: (context, name, _) {
                           return Text(
                             name != null ? '$name님 안녕하세요' : '',
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
                               color: Colors.black,
@@ -47,7 +50,7 @@ class LoginScreen extends StatelessWidget {
                         },
                       );
                     } else {
-                      return Text(
+                      return const Text(
                         'GATE ai',
                         style: TextStyle(
                           fontSize: 32,
@@ -58,37 +61,37 @@ class LoginScreen extends StatelessWidget {
                     }
                   },
                 ),
-                SizedBox(height: 40),
+                const SizedBox(height: 40),
                 TextField(
                   controller: usernameController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     hintText: '아이디',
                     filled: true,
                     fillColor: Colors.white,
                     border: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: BorderRadius.all(Radius.circular(4)),
                     ),
                   ),
-                  style: TextStyle(color: Colors.black),
+                  style: const TextStyle(color: Colors.black),
                 ),
-                SizedBox(height: 12),
+                const SizedBox(height: 12),
                 TextField(
                   controller: passwordController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     hintText: '비밀번호',
                     filled: true,
                     fillColor: Colors.white,
                     border: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: BorderRadius.all(Radius.circular(4)),
                     ),
                   ),
                   obscureText: true,
-                  style: TextStyle(color: Colors.black),
+                  style: const TextStyle(color: Colors.black),
                 ),
-                SizedBox(height: 24),
-                Container(
+                const SizedBox(height: 24),
+                SizedBox(
                   width: double.infinity,
                   height: 50,
                   child: ElevatedButton(
@@ -103,52 +106,71 @@ class LoginScreen extends StatelessWidget {
 
                       final user = await DBHelper.loginUser(username, password);
 
+                      if (!context.mounted) return;
+
                       if (user != null) {
-                        isLoggedIn.value = true; 
-                        userName.value = user['name']; 
+                        isLoggedIn.value = true;
+                        userName.value = user['name'];
+                        userId.value = user['username'];
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('${user['name']}님, 환영합니다!')),
                         );
-                        
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(builder: (_) => HomeScreen()),
+                          MaterialPageRoute(builder: (_) => const HomeScreen()),
                         );
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('아이디 또는 비밀번호가 올바르지 않습니다.')),
+                          const SnackBar(
+                              content: Text('아이디 또는 비밀번호가 올바르지 않습니다.')),
                         );
                       }
                     },
-                    child: Text('로그인'),
+                    child: const Text('로그인'),
                   ),
                 ),
                 TextButton(
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => SignupScreen()),
+                      MaterialPageRoute(builder: (_) => const SignupScreen()),
                     );
                   },
-                  child: Text('회원가입', style: TextStyle(color: Colors.black)),
+                  child:
+                      const Text('회원가입', style: TextStyle(color: Colors.black)),
                 ),
-                SizedBox(height: 30),
-                Row(
+                const SizedBox(height: 30),
+                const Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    Image.asset('assets/kakao.png', width: 60, height: 60),
-                    Image.asset('assets/google.png', width: 60, height: 60),
-                    Image.asset('assets/naver.png', width: 60, height: 60),
+                    Image(
+                      image: AssetImage('assets/kakao.png'),
+                      width: 60,
+                      height: 60,
+                    ),
+                    Image(
+                      image: AssetImage('assets/google.png'),
+                      width: 60,
+                      height: 60,
+                    ),
+                    Image(
+                      image: AssetImage('assets/naver.png'),
+                      width: 60,
+                      height: 60,
+                    ),
                   ],
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () async {
                     final users = await DBHelper.getAllUsers();
+
+                    if (!context.mounted) return;
+
                     showDialog(
                       context: context,
                       builder: (_) => AlertDialog(
-                        title: Text('DB 저장된 회원'),
+                        title: const Text('DB 저장된 회원'),
                         content: SingleChildScrollView(
                           child: Text(users.isEmpty
                               ? '저장된 회원이 없습니다.'
@@ -156,14 +178,14 @@ class LoginScreen extends StatelessWidget {
                         ),
                         actions: [
                           TextButton(
-                            child: Text('닫기'),
+                            child: const Text('닫기'),
                             onPressed: () => Navigator.of(context).pop(),
                           )
                         ],
                       ),
                     );
                   },
-                  child: Text('DB 목록 보기'),
+                  child: const Text('DB 목록 보기'),
                 ),
               ],
             ),
