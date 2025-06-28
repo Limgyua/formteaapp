@@ -13,11 +13,6 @@ import 'category/pet_screen.dart';
 import 'category/bicycle_screen.dart';
 import 'category/book_screen.dart';
 import 'category/daily_items_screen.dart';
-import 'category/etc_screen.dart';
-
-
-import '../store/store_setup_screen.dart';
-import '../store/my_store_manage_screen.dart';
 
 class UsedScreen extends StatefulWidget {
   @override
@@ -42,7 +37,6 @@ class _UsedScreenState extends State<UsedScreen> {
     {'name': '자전거', 'icon': Icons.directions_bike, 'color': Colors.indigo, 'screen': BikeScreen()},
     {'name': '도서', 'icon': Icons.menu_book, 'color': Colors.deepOrange, 'screen': BookScreen()},
     {'name': '게임/취미', 'icon': Icons.videogame_asset, 'color': Colors.purple, 'screen': GameScreen()},
-    {'name': '기타', 'icon': Icons.more_horiz, 'color': Colors.grey, 'screen': EtcScreen()},
   ];
 
   @override
@@ -75,35 +69,7 @@ class _UsedScreenState extends State<UsedScreen> {
       });
     }
   }
-
-  void _showStoreOptions() {
-    showModalBottomSheet(
-      context: context,
-      builder: (_) {
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: Icon(Icons.store_mall_directory),
-              title: Text('개인 매장 개설하기'),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(context, MaterialPageRoute(builder: (_) => StoreSetupScreen()));
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.edit),
-              title: Text('내 매장 관리하기'),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(context, MaterialPageRoute(builder: (_) => MyStoreManageScreen()));
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -139,13 +105,6 @@ class _UsedScreenState extends State<UsedScreen> {
           ],
         ),
         centerTitle: false,
-      ),
-
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showStoreOptions,
-        backgroundColor: Colors.black,
-        child: Icon(Icons.add, color: Colors.white),
-        tooltip: '글쓰기 또는 매장 개설',
       ),
 
       body: SingleChildScrollView(
