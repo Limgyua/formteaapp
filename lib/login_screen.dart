@@ -1,29 +1,26 @@
 import 'package:flutter/material.dart';
-import 'signup_screen.dart'; // 회원가입 화면 import
+import '../db_helper.dart';
+import 'signup_screen.dart';
+import 'main.dart'; // isLoggedIn, HomeScreen import
 
 class LoginScreen extends StatelessWidget {
-  final TextEditingController emailController = TextEditingController();
+  final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-
-      // 상단 앱바 추가
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.home, color: Colors.black), // 홈 아이콘
+          icon: Icon(Icons.home, color: Colors.black),
           onPressed: () {
-            // 홈 화면으로 이동 또는 이전 화면으로 돌아가기
-            Navigator.of(context).pop(); // 이전 화면으로 돌아가기
-            // 혹은 Navigator.pushReplacementNamed(context, '/home'); 처럼 홈 라우트로 이동 가능
+            Navigator.of(context).pop();
           },
         ),
       ),
-
       body: SafeArea(
         child: Center(
           child: Padding(
@@ -41,7 +38,7 @@ class LoginScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 40),
                 TextField(
-                  controller: emailController,
+                  controller: usernameController,
                   decoration: InputDecoration(
                     hintText: '아이디',
                     filled: true,
@@ -78,9 +75,27 @@ class LoginScreen extends StatelessWidget {
                       foregroundColor: Colors.white,
                       elevation: 0,
                     ),
-                    onPressed: () {
-                      print("로그인 시도");
-                      // TODO: 로그인 로직
+                    onPressed: () async {
+                      final username = usernameController.text.trim();
+                      final password = passwordController.text.trim();
+
+                      final user = await DBHelper.loginUser(username, password);
+
+                      if (user != null) {
+                        isLoggedIn.value = true; // 로그인 상태 true로 변경
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('${user['name']}님, 환영합니다!')),
+                        );
+                        // 로그인 성공 시 메인화면으로 이동
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (_) => HomeScreen()),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('아이디 또는 비밀번호가 올바르지 않습니다.')),
+                        );
+                      }
                     },
                     child: Text('로그인'),
                   ),
@@ -102,7 +117,31 @@ class LoginScreen extends StatelessWidget {
                     Image.asset('assets/google.png', width: 60, height: 60),
                     Image.asset('assets/naver.png', width: 60, height: 60),
                   ],
-                )
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () async {
+                    final users = await DBHelper.getAllUsers();
+                    showDialog(
+                      context: context,
+                      builder: (_) => AlertDialog(
+                        title: Text('DB 저장된 회원'),
+                        content: SingleChildScrollView(
+                          child: Text(users.isEmpty
+                              ? '저장된 회원이 없습니다.'
+                              : users.map((u) => u.toString()).join('\n\n')),
+                        ),
+                        actions: [
+                          TextButton(
+                            child: Text('닫기'),
+                            onPressed: () => Navigator.of(context).pop(),
+                          )
+                        ],
+                      ),
+                    );
+                  },
+                  child: Text('DB 목록 보기'),
+                ),
               ],
             ),
           ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../db_helper.dart';
 
 class SignupScreen extends StatefulWidget {
   @override
@@ -22,13 +23,12 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // 화면 너비 제한용 maxWidth 설정 (예: 400)
     double maxWidth = 400;
 
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Center( // 화면 가운데 정렬
+        child: Center(
           child: SingleChildScrollView(
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 24),
             child: ConstrainedBox(
@@ -214,8 +214,27 @@ class _SignupScreenState extends State<SignupScreen> {
                   SizedBox(height: 24),
                   ElevatedButton(
                     onPressed: agree14 && agreeTerms
-                        ? () {
-                            print("회원가입 시도");
+                        ? () async {
+                            if (passwordController.text != confirmPasswordController.text) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('비밀번호가 일치하지 않습니다.')),
+                              );
+                              return;
+                            }
+                            final user = {
+                              'name': nameController.text,
+                              'birth': birthController.text,
+                              'phone': phoneController.text,
+                              'email': emailController.text,
+                              'username': usernameController.text,
+                              'password': passwordController.text,
+                            };
+                            await DBHelper.insertUser(user);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('회원가입 완료!')),
+                            );
+                            // 회원가입 후 로그인 화면으로 이동
+                            Navigator.pushReplacementNamed(context, '/login');
                           }
                         : null,
                     style: ElevatedButton.styleFrom(

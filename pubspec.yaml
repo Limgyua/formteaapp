@@ -1,24 +1,21 @@
 name: formteaapp
 description: A new Flutter project.
 
-# Dart SDK 버전 명시
 environment:
-  sdk: '>=3.3.0 <4.0.0'
+  sdk: ">=3.3.0 <4.0.0"
 
-# 앱에 필요한 의존성들
 dependencies:
   flutter:
     sdk: flutter
-
-  # 필요한 패키지들은 여기에 추가
   # 예: cupertino_icons: ^1.0.2
+  sqflite: ^2.4.2
+  path: ^1.8.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
 flutter:
-
   uses-material-design: true
 
   assets:

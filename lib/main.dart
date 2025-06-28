@@ -4,6 +4,9 @@ import 'screens/used_screen.dart';
 import 'upgo_screen.dart';
 import 'shopping_screen.dart';
 
+// 로그인 상태를 앱 전체에서 공유
+ValueNotifier<bool> isLoggedIn = ValueNotifier<bool>(false);
+
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -13,6 +16,9 @@ class MyApp extends StatelessWidget {
       title: 'GATE ai',
       debugShowCheckedModeBanner: false,
       home: HomeScreen(),
+      routes: {
+        '/login': (_) => LoginScreen(),
+      },
     );
   }
 }
@@ -43,13 +49,52 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         leading: Icon(Icons.menu, color: Colors.black),
         actions: [
-          IconButton(
-            icon: Icon(Icons.person_outline, color: Colors.black),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => LoginScreen()),
-              );
+          ValueListenableBuilder<bool>(
+            valueListenable: isLoggedIn,
+            builder: (context, loggedIn, _) {
+              if (loggedIn) {
+                // 로그인 상태: 로그아웃 아이콘
+                return IconButton(
+                  icon: Icon(Icons.logout, color: Colors.black),
+                  tooltip: '로그아웃',
+                  onPressed: () async {
+                    final result = await showDialog<bool>(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: Text('로그아웃'),
+                        content: Text('로그아웃하시겠습니까?'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(false),
+                            child: Text('아니요'),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(true),
+                            child: Text('예'),
+                          ),
+                        ],
+                      ),
+                    );
+                    if (result == true) {
+                      isLoggedIn.value = false;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('로그아웃 되었습니다.')),
+                      );
+                    }
+                  },
+                );
+              } else {
+                // 비로그인 상태: 로그인 아이콘
+                return IconButton(
+                  icon: Icon(Icons.person_outline, color: Colors.black),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => LoginScreen()),
+                    );
+                  },
+                );
+              }
             },
           ),
           SizedBox(width: 8),
