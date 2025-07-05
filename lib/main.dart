@@ -51,43 +51,84 @@ class _HomeScreenState extends State<HomeScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const SizedBox(height: 32),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 32.0),
-                  child: ValueListenableBuilder<bool>(
-                    valueListenable: isLoggedIn,
-                    builder: (context, loggedIn, _) {
-                      if (loggedIn) {
-                        return ValueListenableBuilder<String?>(
-                          valueListenable: userName,
-                          builder: (context, name, _) {
-                            return GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (_) => const MyPageScreen()),
-                                );
-                              },
-                              child: Text(
-                                name != null ? '$name님' : '',
-                                style: const TextStyle(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.blueAccent,
-                                  decoration: TextDecoration.underline,
+
+                ValueListenableBuilder<bool>(
+                  valueListenable: isLoggedIn,
+                  builder: (context, loggedIn, _) {
+                    if (loggedIn) {
+                      return ValueListenableBuilder<String?>(
+                        valueListenable: userName,
+                        builder: (context, name, _) {
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => const MyPageScreen()),
+                              );
+                            },
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  name != null ? '$name님' : '',
+                                  style: const TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                    decoration: TextDecoration.none,
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
-                        );
-                      } else {
-                        return const Text(
-                          '로그인 해주세요',
-                          style: TextStyle(fontSize: 18, color: Colors.grey),
-                        );
-                      }
-                    },
-                  ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  '마이페이지',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.grey[600],
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    } else {
+                      return const Text(
+                        '로그인 해주세요',
+                        style: TextStyle(fontSize: 18, color: Colors.grey),
+                      );
+                    }
+                  },
+                ),
+
+                // 공지사항 메뉴 추가
+                ListTile(
+                  leading: const Icon(Icons.campaign, color: Colors.black),
+                  title: const Text('공지사항'),
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (_) => const AlertDialog(
+                        title: Text('공지사항'),
+                        content: Text('공지사항 화면을 구현하세요.'),
+                      ),
+                    );
+                  },
+                ),
+                // 고객센터 메뉴 추가
+                ListTile(
+                  leading: const Icon(Icons.headset_mic, color: Colors.black),
+                  title: const Text('고객센터'),
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (_) => const AlertDialog(
+                        title: Text('고객센터'),
+                        content: Text('고객센터 화면을 구현하세요.'),
+                      ),
+                    );
+                  },
                 ),
                 Divider(thickness: 1, height: 1, color: Colors.grey[300]),
               ],
