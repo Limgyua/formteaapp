@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
-import 'login_screen.dart';
-import 'screens/used_screen.dart';
-import 'upgo_screen.dart';
-import 'shopping_screen.dart';
-import 'my_page_screen.dart';
+import 'auth/login_screen.dart';
+import 'screens/used/used_screen.dart';
+import 'upgo/upgo_screen.dart';
+import 'shopping/shopping_screen.dart';
 
-// 로그인 상태와 사용자 이름을 앱 전체에서 공유
-ValueNotifier<bool> isLoggedIn = ValueNotifier<bool>(false);
-ValueNotifier<String?> userName = ValueNotifier<String?>(null);
-ValueNotifier<String?> userId = ValueNotifier<String?>(null);
+import 'auth/my_page_screen.dart';
+import 'global.dart';
 
 void main() => runApp(const MyApp());
 
@@ -43,99 +40,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      drawer: FractionallySizedBox(
-        widthFactor: 0.7,
-        child: Drawer(
-          child: SafeArea(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const SizedBox(height: 32),
-
-                ValueListenableBuilder<bool>(
-                  valueListenable: isLoggedIn,
-                  builder: (context, loggedIn, _) {
-                    if (loggedIn) {
-                      return ValueListenableBuilder<String?>(
-                        valueListenable: userName,
-                        builder: (context, name, _) {
-                          return GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) => const MyPageScreen()),
-                              );
-                            },
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  name != null ? '$name님' : '',
-                                  style: const TextStyle(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                    decoration: TextDecoration.none,
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  '마이페이지',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: Colors.grey[600],
-                                    decoration: TextDecoration.underline,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      );
-                    } else {
-                      return const Text(
-                        '로그인 해주세요',
-                        style: TextStyle(fontSize: 18, color: Colors.grey),
-                      );
-                    }
-                  },
-                ),
-
-                // 공지사항 메뉴 추가
-                ListTile(
-                  leading: const Icon(Icons.campaign, color: Colors.black),
-                  title: const Text('공지사항'),
-                  onTap: () {
-                    showDialog(
-                      context: context,
-                      builder: (_) => const AlertDialog(
-                        title: Text('공지사항'),
-                        content: Text('공지사항 화면을 구현하세요.'),
-                      ),
-                    );
-                  },
-                ),
-                // 고객센터 메뉴 추가
-                ListTile(
-                  leading: const Icon(Icons.headset_mic, color: Colors.black),
-                  title: const Text('고객센터'),
-                  onTap: () {
-                    showDialog(
-                      context: context,
-                      builder: (_) => const AlertDialog(
-                        title: Text('고객센터'),
-                        content: Text('고객센터 화면을 구현하세요.'),
-                      ),
-                    );
-                  },
-                ),
-                Divider(thickness: 1, height: 1, color: Colors.grey[300]),
-              ],
-            ),
-          ),
-        ),
-      ),
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -209,126 +113,200 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(width: 8),
         ],
       ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16),
-          child: Column(
-            children: [
-              const SizedBox(height: 20),
-              Container(
-                width: double.infinity,
-                height: 44,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(30),
-                  border: Border.all(color: Colors.black, width: 1.5),
-                ),
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: 'Search',
-                    prefixIcon: const Icon(Icons.search, color: Colors.black),
-                    border: InputBorder.none,
-                    hintStyle: TextStyle(color: Colors.grey[600]),
-                  ),
-                  style: const TextStyle(color: Colors.black),
-                  cursorColor: Colors.black,
-                ),
-              ),
-              const SizedBox(height: 100),
-              SizedBox(
-                height: 320,
-                child: GestureDetector(
-                  onHorizontalDragEnd: (details) {
-                    if (details.primaryVelocity != null) {
-                      if (details.primaryVelocity! < 0) {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => const ShoppingScreen()));
-                      } else if (details.primaryVelocity! > 0) {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => const UpgoScreen()));
+      drawer: FractionallySizedBox(
+        widthFactor: 0.7,
+        child: Drawer(
+          child: SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  child: ValueListenableBuilder<String?>(
+                    valueListenable: userName,
+                    builder: (context, name, _) {
+                      if (name != null && name.trim().isNotEmpty) {
+                        return Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                name,
+                                style: const TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.edit,
+                                  size: 20, color: Colors.grey),
+                              tooltip: '개인정보 수정',
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) => const MyPageScreen()),
+                                );
+                              },
+                            ),
+                          ],
+                        );
+                      } else {
+                        return const Padding(
+                          padding: EdgeInsets.only(top: 4.0),
+                          child: Text(
+                            '로그인 해주세요',
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.grey,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        );
                       }
-                    }
-                  },
-                  onVerticalDragUpdate: (details) {
-                    verticalDragDistance += details.delta.dy;
-                  },
-                  onVerticalDragEnd: (details) {
-                    if (verticalDragDistance > 50) {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => const UsedScreen()));
-                    }
-                    verticalDragDistance = 0;
-                  },
-                  child: Center(
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        Image.asset(
-                          'assets/logo.png',
-                          width: 450,
-                          height: 450,
-                        ),
-                        Positioned(
-                          left: 1,
-                          child: TextButton(
-                            onPressed: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (_) => const UpgoScreen()));
-                            },
-                            child: const Text(
-                              '업고',
-                              style:
-                                  TextStyle(fontSize: 18, color: Colors.black),
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      onDrawerChanged: (isOpened) {
+        if (isOpened) setState(() {});
+      },
+      body: SafeArea(
+        child: GestureDetector(
+          behavior: HitTestBehavior.translucent,
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16),
+            child: Column(
+              children: [
+                const SizedBox(height: 20),
+                Container(
+                  width: double.infinity,
+                  height: 44,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(30),
+                    border: Border.all(color: Colors.black, width: 1.5),
+                  ),
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: 'Search',
+                      prefixIcon: const Icon(Icons.search, color: Colors.black),
+                      border: InputBorder.none,
+                      hintStyle: TextStyle(color: Colors.grey[600]),
+                    ),
+                    style: const TextStyle(color: Colors.black),
+                    cursorColor: Colors.black,
+                  ),
+                ),
+                const SizedBox(height: 100),
+                SizedBox(
+                  height: 320,
+                  child: GestureDetector(
+                    onHorizontalDragEnd: (details) {
+                      if (details.primaryVelocity != null) {
+                        if (details.primaryVelocity! > 0) {
+                          // 오른쪽 드래그: 쇼핑
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => const ShoppingScreen()));
+                        } else if (details.primaryVelocity! < 0) {
+                          // 왼쪽 드래그: 업고
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => const UpgoScreen()));
+                        }
+                      }
+                    },
+                    onVerticalDragUpdate: (details) {
+                      verticalDragDistance += details.delta.dy;
+                    },
+                    onVerticalDragEnd: (details) {
+                      if (verticalDragDistance > 50) {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const UsedScreen()));
+                      }
+                      verticalDragDistance = 0;
+                    },
+                    child: Center(
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Image.asset(
+                            'assets/logo.png',
+                            width: 450,
+                            height: 450,
+                          ),
+                          Positioned(
+                            left: 1,
+                            child: TextButton(
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (_) => const UpgoScreen()));
+                              },
+                              child: const Text(
+                                '업고',
+                                style: TextStyle(
+                                    fontSize: 18, color: Colors.black),
+                              ),
                             ),
                           ),
-                        ),
-                        Positioned(
-                          right: 1,
-                          child: TextButton(
-                            onPressed: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (_) => const ShoppingScreen()));
-                            },
-                            child: const Text(
-                              '쇼핑',
-                              style:
-                                  TextStyle(fontSize: 18, color: Colors.black),
+                          Positioned(
+                            right: 1,
+                            child: TextButton(
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (_) =>
+                                            const ShoppingScreen()));
+                              },
+                              child: const Text(
+                                '쇼핑',
+                                style: TextStyle(
+                                    fontSize: 18, color: Colors.black),
+                              ),
                             ),
                           ),
-                        ),
-                        Positioned(
-                          bottom: 10,
-                          child: TextButton(
-                            onPressed: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (_) => const UsedScreen()));
-                            },
-                            child: const Text(
-                              '중고',
-                              style:
-                                  TextStyle(fontSize: 18, color: Colors.black),
+                          Positioned(
+                            bottom: 10,
+                            child: TextButton(
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (_) => const UsedScreen()));
+                              },
+                              child: const Text(
+                                '중고',
+                                style: TextStyle(
+                                    fontSize: 18, color: Colors.black),
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

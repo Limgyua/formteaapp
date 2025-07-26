@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'main.dart';
-import 'db_helper.dart';
+import '../global.dart';
+import '../db_helper.dart';
 
 class MyPageScreen extends StatefulWidget {
   const MyPageScreen({super.key});
@@ -17,6 +17,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
   final birthController = TextEditingController();
   final passwordController = TextEditingController();
 
+  bool editable = false;
   bool passwordEditable = false;
 
   @override
@@ -25,8 +26,19 @@ class _MyPageScreenState extends State<MyPageScreen> {
     loadUser();
   }
 
+  void enableEdit() {
+    setState(() {
+      editable = true;
+    });
+  }
+
   Future<void> loadUser() async {
-    if (userId.value == null) return;
+    if (userId.value == null) {
+      setState(() {
+        isLoading = false;
+      });
+      return;
+    }
     final user = await DBHelper.getUserByUsername(userId.value!);
     setState(() {
       userData = user;
@@ -159,6 +171,13 @@ class _MyPageScreenState extends State<MyPageScreen> {
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 1,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit, color: Colors.grey),
+            tooltip: '수정하기',
+            onPressed: enableEdit,
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
@@ -182,6 +201,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
             const SizedBox(height: 4),
             TextField(
               controller: nameController,
+              enabled: editable,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 hintText: '이름',
@@ -192,6 +212,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
             const SizedBox(height: 4),
             TextField(
               controller: birthController,
+              enabled: editable,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 hintText: '생년월일',
@@ -202,7 +223,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
             const SizedBox(height: 4),
             GestureDetector(
               onTap: () async {
-                if (!passwordEditable) {
+                if (!passwordEditable && editable) {
                   await showIdDialog();
                 }
               },
@@ -212,6 +233,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
                   controller: passwordController,
                   obscureText: true,
                   focusNode: _passwordFocusNode,
+                  enabled: editable,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     hintText: '비밀번호',
@@ -225,28 +247,52 @@ class _MyPageScreenState extends State<MyPageScreen> {
               style: TextStyle(fontSize: 12, color: Colors.grey),
             ),
             const SizedBox(height: 30),
-            ElevatedButton(
-              onPressed: updateUser,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black,
-                foregroundColor: Colors.white,
-                minimumSize: const Size(double.infinity, 48),
+            if (editable)
+              ElevatedButton(
+                onPressed: updateUser,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.black,
+                  foregroundColor: Colors.white,
+                  minimumSize: const Size(double.infinity, 48),
+                ),
+                child: const Text('수정하기'),
               ),
-              child: const Text('수정하기'), // ← 마지막에 위치
-            ),
             const SizedBox(height: 30),
-            GestureDetector(
-              onTap: deleteUser,
-              child: Center(
-                child: Text(
-                  '회원탈퇴',
-                  style: TextStyle(
-                    color: Colors.grey[600],
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                GestureDetector(
+                  onTap: deleteUser,
+                  child: Text(
+                    '회원탈퇴',
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-              ),
+                const SizedBox(width: 24),
+                GestureDetector(
+                  onTap: () {
+                    isLoggedIn.value = false;
+                    userName.value = null;
+                    userId.value = null;
+                    Navigator.of(context).popUntil((route) => route.isFirst);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('로그아웃 되었습니다.')),
+                    );
+                  },
+                  child: Text(
+                    '로그아웃',
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
