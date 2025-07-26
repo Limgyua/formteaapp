@@ -121,38 +121,19 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: const EdgeInsets.fromLTRB(32, 30, 20, 20),
                   child: ValueListenableBuilder<String?>(
                     valueListenable: userName,
                     builder: (context, name, _) {
                       if (name != null && name.trim().isNotEmpty) {
-                        return Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                name,
-                                style: const TextStyle(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.edit,
-                                  size: 20, color: Colors.grey),
-                              tooltip: '개인정보 수정',
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (_) => const MyPageScreen()),
-                                );
-                              },
-                            ),
-                          ],
+                        return Text(
+                          '$name님',
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         );
                       } else {
                         return const Padding(

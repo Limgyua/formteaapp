@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:formteaapp/shopping_screen.dart';
 import 'package:intl/intl.dart';
+
+class Product {
+  final String name;
+  final int price;
+  final String imageUrl;
+
+  Product({required this.name, required this.price, required this.imageUrl});
+}
 
 class ItemPage extends StatelessWidget {
   final Product product;

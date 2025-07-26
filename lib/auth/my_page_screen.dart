@@ -13,6 +13,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
   Map<String, dynamic>? userData;
   bool isLoading = true;
 
+  final idController = TextEditingController();
   final nameController = TextEditingController();
   final birthController = TextEditingController();
   final passwordController = TextEditingController();
@@ -42,6 +43,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
     final user = await DBHelper.getUserByUsername(userId.value!);
     setState(() {
       userData = user;
+      idController.text = user?['username'] ?? '';
       nameController.text = user?['name'] ?? '';
       birthController.text = user?['birth'] ?? '';
       passwordController.text = user?['password'] ?? '';
@@ -187,8 +189,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
             const Text('아이디', style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 4),
             TextField(
-              controller:
-                  TextEditingController(text: userData?['username'] ?? ''),
+              controller: idController,
               enabled: false,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
