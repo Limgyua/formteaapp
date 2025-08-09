@@ -20,13 +20,11 @@ class DBHelper {
 
   // 중고글 테이블 생성 (이미 있으면 무시)
   static Future<void> createUsedTable(Database db) async {
-    // 개발 환경: 테이블 구조 변경 시 기존 테이블 삭제 후 재생성 (데이터 유실 주의)
-    await db.execute('DROP TABLE IF EXISTS used_items');
     await db.execute(
-      'CREATE TABLE used_items ('
+      'CREATE TABLE IF NOT EXISTS used_items ('
       'id INTEGER PRIMARY KEY AUTOINCREMENT, '
       'title TEXT, content TEXT, price TEXT, location TEXT, '
-      'imagePaths TEXT, productState TEXT, dealType TEXT, author TEXT, createdAt TEXT'
+      'imagePaths TEXT, productState TEXT, category TEXT, dealType TEXT, author TEXT, createdAt TEXT'
       ')',
     );
   }
@@ -40,10 +38,13 @@ class DBHelper {
         );
         await createUsedTable(db);
       },
-      onOpen: (db) async {
-        await createUsedTable(db);
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 2) {
+          // 기존 테이블에 category 컬럼 추가
+          await db.execute('ALTER TABLE used_items ADD COLUMN category TEXT');
+        }
       },
-      version: 1,
+      version: 2,
     );
   }
 
@@ -57,8 +58,7 @@ class DBHelper {
     final data = Map<String, dynamic>.from(item);
     data['imagePaths'] = imagePaths;
     data.remove('images');
-    await db.insert('used_items', data,
-        conflictAlgorithm: ConflictAlgorithm.replace);
+    await db.insert('used_items', data);
   }
 
   // 중고글 전체 조회 (최신순)
@@ -76,10 +76,26 @@ class DBHelper {
     }).toList();
   }
 
+  // 카테고리별 중고글 조회 (최신순)
+  static Future<List<Map<String, dynamic>>> getUsedItemsByCategory(
+      String category) async {
+    final db = await DBHelper.database();
+    final result = await db.query('used_items',
+        where: 'category = ?', whereArgs: [category], orderBy: 'id DESC');
+    // imagePaths를 images(List<File>)로 변환해서 반환
+    return result.map((row) {
+      final paths = (row['imagePaths'] ?? '').toString();
+      final images = paths.isNotEmpty ? paths.split('|') : [];
+      return {
+        ...row,
+        'images': images.isNotEmpty ? images.map((p) => File(p)).toList() : [],
+      };
+    }).toList();
+  }
+
   static Future<void> insertUser(Map<String, dynamic> user) async {
     final db = await DBHelper.database();
-    await db.insert('users', user,
-        conflictAlgorithm: ConflictAlgorithm.replace);
+    await db.insert('users', user);
   }
 
   static Future<List<Map<String, dynamic>>> getAllUsers() async {

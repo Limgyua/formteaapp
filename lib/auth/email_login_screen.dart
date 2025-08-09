@@ -129,8 +129,15 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                         final user = await DBHelper.loginUser(email, password);
                         if (!context.mounted) return;
                         if (user != null) {
+                          print('로그인 성공 - user data: $user');
                           isLoggedIn.value = true;
                           userName.value = user['name'];
+                          // username이 비어있으면 email을 사용
+                          userId.value = (user['username'] != null &&
+                                  user['username'].toString().isNotEmpty)
+                              ? user['username']
+                              : user['email'];
+                          print('userId.value 설정 완료: ${userId.value}');
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(content: Text('${user['name']}님, 환영합니다!')),
                           );

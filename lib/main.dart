@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'auth/login_screen.dart';
 import 'screens/used/used_screen.dart';
+import 'screens/chat/chat_list_screen.dart';
 import 'upgo/upgo_screen.dart';
 import 'shopping/shopping_screen.dart';
 
@@ -61,6 +62,26 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         actions: [
+          // 채팅 아이콘 추가
+          ValueListenableBuilder<bool>(
+            valueListenable: isLoggedIn,
+            builder: (context, loggedIn, _) {
+              if (loggedIn) {
+                return IconButton(
+                  icon: const Icon(Icons.chat_bubble_outline,
+                      color: Colors.black),
+                  tooltip: '채팅',
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const ChatListScreen()),
+                    );
+                  },
+                );
+              }
+              return const SizedBox.shrink();
+            },
+          ),
           ValueListenableBuilder<bool>(
             valueListenable: isLoggedIn,
             builder: (context, loggedIn, _) {

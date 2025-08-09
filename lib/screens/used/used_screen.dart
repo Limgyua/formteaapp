@@ -14,6 +14,7 @@ import '../category/bicycle_screen.dart';
 import '../category/book_screen.dart';
 import '../category/daily_items_screen.dart';
 import 'used_item_create_screen.dart';
+import 'used_item_detail_screen.dart';
 import '../../db_helper.dart';
 import '../../global.dart';
 
@@ -148,6 +149,12 @@ class _UsedScreenState extends State<UsedScreen> {
       'icon': Icons.videogame_asset,
       'color': Colors.purple,
       'screen': const GameScreen()
+    },
+    {
+      'name': '기타',
+      'icon': Icons.more_horiz,
+      'color': Colors.grey,
+      'screen': const GameScreen() // 임시로 GameScreen 사용, 나중에 별도 화면 만들면 변경
     },
   ];
 
@@ -464,7 +471,15 @@ class _UsedScreenState extends State<UsedScreen> {
                                 ),
                               ],
                             ),
-                            onTap: () {},
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      UsedItemDetailScreen(item: item),
+                                ),
+                              );
+                            },
                           ),
                         );
                       },

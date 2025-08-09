@@ -1,30 +1,30 @@
 import 'package:flutter/material.dart';
 import '../../db_helper.dart';
 
-class LivingScreen extends StatefulWidget {
-  const LivingScreen({super.key});
+class OtherScreen extends StatefulWidget {
+  const OtherScreen({super.key});
 
   @override
-  State<LivingScreen> createState() => _LivingScreenState();
+  State<OtherScreen> createState() => _OtherScreenState();
 }
 
-class _LivingScreenState extends State<LivingScreen> {
-  List<Map<String, dynamic>> livingItems = [];
+class _OtherScreenState extends State<OtherScreen> {
+  List<Map<String, dynamic>> otherItems = [];
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadLivingItems();
+    _loadOtherItems();
   }
 
-  Future<void> _loadLivingItems() async {
+  Future<void> _loadOtherItems() async {
     setState(() {
       isLoading = true;
     });
-    final items = await DBHelper.getUsedItemsByCategory('생활용품');
+    final items = await DBHelper.getUsedItemsByCategory('기타');
     setState(() {
-      livingItems = items;
+      otherItems = items;
       isLoading = false;
     });
   }
@@ -34,7 +34,7 @@ class _LivingScreenState extends State<LivingScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('생활용품',
+        title: const Text('기타',
             style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
@@ -44,16 +44,16 @@ class _LivingScreenState extends State<LivingScreen> {
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : livingItems.isEmpty
+          : otherItems.isEmpty
               ? const Center(
-                  child: Text('아직 등록된 생활용품이 없습니다.',
+                  child: Text('아직 등록된 기타 상품이 없습니다.',
                       style: TextStyle(color: Colors.grey, fontSize: 16)))
               : ListView.separated(
                   padding: const EdgeInsets.all(20),
-                  itemCount: livingItems.length,
+                  itemCount: otherItems.length,
                   separatorBuilder: (_, __) => const SizedBox(height: 16),
                   itemBuilder: (context, idx) {
-                    final item = livingItems[idx];
+                    final item = otherItems[idx];
                     String priceText = '';
                     final price = item['price'];
                     if (price == null ||
@@ -96,8 +96,8 @@ class _LivingScreenState extends State<LivingScreen> {
                                       color: Colors.grey[200],
                                       borderRadius: BorderRadius.circular(10),
                                     ),
-                                    child: const Icon(Icons.home,
-                                        color: Colors.green, size: 32),
+                                    child: const Icon(Icons.more_horiz,
+                                        color: Colors.grey, size: 32),
                                   ),
                         title: Row(
                           children: [
@@ -117,9 +117,9 @@ class _LivingScreenState extends State<LivingScreen> {
                                   horizontal: 8, vertical: 2),
                               decoration: BoxDecoration(
                                 color: item['productState'] == '새상품'
-                                    ? Colors.green
+                                    ? Colors.grey
                                     : Colors.white,
-                                border: Border.all(color: Colors.green),
+                                border: Border.all(color: Colors.grey),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
@@ -127,7 +127,7 @@ class _LivingScreenState extends State<LivingScreen> {
                                 style: TextStyle(
                                   color: item['productState'] == '새상품'
                                       ? Colors.white
-                                      : Colors.green,
+                                      : Colors.grey[700],
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -148,7 +148,7 @@ class _LivingScreenState extends State<LivingScreen> {
                                 style: TextStyle(
                                     color: priceText == '나눔'
                                         ? Colors.green
-                                        : Colors.green,
+                                        : Colors.grey[700],
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16)),
                           ],
