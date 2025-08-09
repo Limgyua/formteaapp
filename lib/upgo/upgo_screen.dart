@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../store/store_setup_screen.dart';
-import '../../store/my_store_manage_screen.dart';
+import '../store/store_setup_screen.dart';
+import '../store/my_store_manage_screen.dart';
 
 class UpgoScreen extends StatelessWidget {
   const UpgoScreen({super.key}); // ← key 파라미터 및 const 생성자 추가

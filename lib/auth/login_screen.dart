@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../db_helper.dart';
+import '../db_helper.dart';
 import 'signup_screen.dart';
 import 'email_login_screen.dart';
 

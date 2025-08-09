@@ -37,48 +37,130 @@ class _RegionSelectScreenState extends State<RegionSelectScreen> {
         if (district.isEmpty)
           district = placemark.subLocality ?? placemark.locality ?? '';
         if (dong.isEmpty) dong = placemark.name ?? placemark.thoroughfare ?? '';
-        // placemark의 city/locality 조합으로 한글 변환
-        String cityKo = city;
-        if ((city == 'Gyeonggi-do' && placemark.locality == 'Bucheon') ||
-            city == 'Bucheon') cityKo = '경기도 부천시';
-        if (city == 'Seoul') cityKo = '서울특별시';
-        if (city == 'Incheon') cityKo = '인천광역시';
-        if (city == 'Busan') cityKo = '부산광역시';
-        if (city == 'Daegu') cityKo = '대구광역시';
-        if (city == 'Gwangju') cityKo = '광주광역시';
-        if (city == 'Daejeon') cityKo = '대전광역시';
-        if (city == 'Ulsan') cityKo = '울산광역시';
-        if (city == 'Sejong') cityKo = '세종특별자치시';
-        // 동 영문→한글 변환
-        String dongKo = dong;
-        if (dong == 'Wonmi-dong') dongKo = '원미동';
-        // 필요시 추가 맵핑
-        print('city: $cityKo, district: $district, dong: $dongKo');
-        // 여러 조합으로 매칭 시도
-        String matchRegion = '';
-        List<String> candidates = [
-          '$cityKo $dongKo', // 가장 구체적인 후보를 맨 앞에
-          '$cityKo $district $dongKo',
-          '$cityKo $district',
-          '$cityKo',
-          '$district $dongKo',
-          '$district',
-          '$dongKo',
-        ];
-        // 1. 정확히 일치하는 지역명 우선 매칭
-        matchRegion = regionList.firstWhere(
-          (r) => r == '$cityKo $dongKo',
-          orElse: () => '',
-        );
-        // 2. 없으면 기존 방식대로 startsWith로 fallback
-        if (matchRegion.isEmpty) {
-          for (final candidate in candidates) {
-            matchRegion = regionList.firstWhere(
-              (r) => r.startsWith(candidate),
-              orElse: () => '',
-            );
-            if (matchRegion.isNotEmpty) break;
+        // 스마트 한글 변환 함수
+        String convertToKorean(String englishName) {
+          // 이미 한글이면 그대로 반환
+          if (RegExp(r'[가-힣]').hasMatch(englishName)) return englishName;
+
+          String result = englishName;
+
+          // 1. 기본 패턴 변환
+          result = result.replaceAll('-dong', '동');
+          result = result.replaceAll('-gu', '구');
+          result = result.replaceAll('-si', '시');
+          result = result.replaceAll('-gun', '군');
+          result = result.replaceAll('-ro', '로');
+          result = result.replaceAll('-gil', '길');
+          result = result.replaceAll('Street', '로');
+          result = result.replaceAll('Road', '로');
+
+          // 2. 주요 지역명 자동 변환
+          final Map<String, String> regionMap = {
+            'Seoul': '서울',
+            'Busan': '부산',
+            'Daegu': '대구',
+            'Incheon': '인천',
+            'Gwangju': '광주',
+            'Daejeon': '대전',
+            'Ulsan': '울산',
+            'Sejong': '세종',
+            'Gyeonggi': '경기',
+            'Gangwon': '강원',
+            'Chungbuk': '충북',
+            'Chungnam': '충남',
+            'Jeonbuk': '전북',
+            'Jeonnam': '전남',
+            'Gyeongbuk': '경북',
+            'Gyeongnam': '경남',
+            'Jeju': '제주',
+            'Bucheon': '부천',
+            'Suwon': '수원',
+            'Yongin': '용인',
+            'Goyang': '고양',
+            'Changwon': '창원',
+            'Seongnam': '성남',
+            'Anyang': '안양',
+            'Ansan': '안산',
+            'Gangnam': '강남',
+            'Gangdong': '강동',
+            'Gangbuk': '강북',
+            'Gangseo': '강서',
+            'Gwanak': '관악',
+            'Gwangjin': '광진',
+            'Guro': '구로',
+            'Geumcheon': '금천',
+            'Nowon': '노원',
+            'Dobong': '도봉',
+            'Dongdaemun': '동대문',
+            'Dongjak': '동작',
+            'Mapo': '마포',
+            'Seodaemun': '서대문',
+            'Seocho': '서초',
+            'Seongdong': '성동',
+            'Seongbuk': '성북',
+            'Songpa': '송파',
+            'Yangcheon': '양천',
+            'Yeongdeungpo': '영등포',
+            'Yongsan': '용산',
+            'Eunpyeong': '은평',
+            'Jongno': '종로',
+            'Jung': '중',
+            'Jungnang': '중랑',
+            'Bupyeong': '부평',
+            'Wonmi': '원미',
+            'Sang': '상',
+            'Simgok': '심곡',
+            'Yeokgok': '역곡',
+            'Sosa': '소사',
+            'Ojeong': '오정',
+            'Galsan': '갈산',
+            'Cheongcheon': '청천',
+            'Samsan': '삼산',
+          };
+
+          // 3. 단어별 변환 적용
+          for (String english in regionMap.keys) {
+            result = result.replaceAll(english, regionMap[english]!);
           }
+
+          // 4. 불필요한 접미사 제거
+          result = result.replaceAll(' Metropolitan City', '');
+          result = result.replaceAll(' Special City', '');
+          result = result.replaceAll(' Province', '');
+          result = result.replaceAll(' City', '');
+          result = result.replaceAll(' County', '');
+          result = result.replaceAll(' District', '');
+
+          return result;
+        }
+
+        // placemark의 city/district/dong을 한글로 변환
+        String cityKo = convertToKorean(city);
+        String districtKo = convertToKorean(district);
+        String dongKo = convertToKorean(dong);
+        // 필요시 추가 맵핑
+        print('city: $cityKo, district: $districtKo, dong: $dongKo');
+        // 행정동(동)만 반환하도록 수정
+        String matchRegion = '';
+
+        // 1. 동 이름이 있으면 동만 반환 (한글로 변환된 것 우선)
+        if (dongKo.isNotEmpty) {
+          matchRegion = dongKo;
+        }
+        // 2. 동이 없으면 구/군 이름 반환
+        else if (districtKo.isNotEmpty) {
+          matchRegion = districtKo;
+        }
+        // 3. 그것도 없으면 시/도 이름 반환
+        else if (cityKo.isNotEmpty) {
+          matchRegion = cityKo;
+        }
+
+        // 새로운 지역을 최근 목록에 추가
+        if (matchRegion.isNotEmpty && !recentRegions.contains(matchRegion)) {
+          recentRegions.insert(0, matchRegion);
+          if (recentRegions.length > 20)
+            recentRegions.removeLast(); // 최대 20개만 유지
         }
         if (matchRegion.isNotEmpty) {
           Navigator.pop(context, matchRegion);
@@ -97,93 +179,14 @@ class _RegionSelectScreenState extends State<RegionSelectScreen> {
     }
   }
 
-  final List<Map<String, dynamic>> cities = [
-    {
-      'name': '경기도 부천시',
-      'subs': [
-        '중동',
-        '상동',
-        '송내동',
-        '심곡동',
-        '역곡동',
-        '춘의동',
-        '도당동',
-        '약대동',
-        '고강동',
-        '괴안동',
-        '범박동',
-        '옥길동',
-        '소사본동',
-        '원종동',
-        '삼정동',
-        '내동',
-        '여월동',
-        '작동',
-        '대장동',
-        '오정동',
-        '원미동' // 추가
-      ]
-    },
-    {
-      'name': '서울특별시',
-      'subs': ['종로구', '중구', '용산구', '성동구', '광진구']
-    },
-    {
-      'name': '부산광역시',
-      'subs': ['중구', '서구', '동구', '영도구', '부산진구']
-    },
-    {
-      'name': '대구광역시',
-      'subs': ['중구', '동구', '서구', '남구', '북구']
-    },
-    {
-      'name': '인천광역시',
-      'subs': [
-        '중구',
-        '동구',
-        '미추홀구',
-        '연수구',
-        '남동구',
-        '부평구',
-        '계양구',
-        '서구',
-        // 각 구별 동 세분화 (예시)
-        '중구 신흥동', '중구 신포동', '중구 운서동',
-        '동구 송림동', '동구 송현동',
-        '미추홀구 주안동', '미추홀구 관교동', '미추홀구 용현동',
-        '연수구 송도동', '연수구 옥련동', '연수구 연수동',
-        '남동구 구월동', '남동구 간석동', '남동구 논현동',
-        // 부평구 동 전체 세분화
-        '부평구 부평1동', '부평구 부평2동', '부평구 부평3동', '부평구 부평4동', '부평구 부평5동', '부평구 부평6동',
-        '부평구 갈산1동', '부평구 갈산2동',
-        '부평구 삼산1동', '부평구 삼산2동',
-        '부평구 부개1동', '부평구 부개2동', '부평구 부개3동',
-        '부평구 일신동',
-        '부평구 산곡1동', '부평구 산곡2동', '부평구 산곡3동', '부평구 산곡4동',
-        '부평구 십정1동', '부평구 십정2동',
-        '부평구 청천1동', '부평구 청천2동',
-        '계양구 계산동', '계양구 작전동', '계양구 임학동',
-        '서구 청라동', '서구 가정동', '서구 석남동',
-      ]
-    },
-    {
-      'name': '광주광역시',
-      'subs': ['동구', '서구', '남구', '북구', '광산구']
-    },
-    {
-      'name': '대전광역시',
-      'subs': ['동구', '중구', '서구', '유성구', '대덕구']
-    },
-    {
-      'name': '울산광역시',
-      'subs': ['중구', '남구', '동구', '북구', '울주군']
-    },
-    {
-      'name': '세종특별자치시',
-      'subs': ['세종시']
-    },
+  // 사용자가 이전에 선택했던 지역들을 저장 (동적으로 추가)
+  List<String> recentRegions = [
+    '서울특별시 강남구',
+    '경기도 부천시',
+    '인천광역시 부평구',
+    '경기도 안양시',
+    '서울특별시 종로구'
   ];
-  List<String> regionList = [];
   List<String> filteredList = [];
   final TextEditingController searchController = TextEditingController();
   String? selectedRegion;
@@ -191,12 +194,8 @@ class _RegionSelectScreenState extends State<RegionSelectScreen> {
   @override
   void initState() {
     super.initState();
-    // 모든 지역을 하나의 리스트로 합침 (ex: 서울특별시 종로구)
-    regionList = [
-      for (var city in cities)
-        for (var sub in city['subs']) '${city['name']} $sub'
-    ];
-    filteredList = List<String>.from(regionList);
+    // 최근 지역 목록으로 초기화
+    filteredList = List<String>.from(recentRegions);
   }
 
   @override
@@ -224,7 +223,7 @@ class _RegionSelectScreenState extends State<RegionSelectScreen> {
               ),
               onChanged: (value) {
                 setState(() {
-                  filteredList = regionList
+                  filteredList = recentRegions
                       .where((region) => region.contains(value))
                       .toList();
                 });
@@ -260,6 +259,20 @@ class _RegionSelectScreenState extends State<RegionSelectScreen> {
                   return ListTile(
                     title: Text(region),
                     onTap: () {
+                      // 선택된 지역을 최근 목록에 동적 추가
+                      if (!recentRegions.contains(region)) {
+                        setState(() {
+                          recentRegions.insert(0, region);
+                          if (recentRegions.length > 20)
+                            recentRegions.removeLast(); // 최대 20개만 유지
+                        });
+                      } else {
+                        // 이미 있는 경우 맨 앞으로 이동
+                        setState(() {
+                          recentRegions.remove(region);
+                          recentRegions.insert(0, region);
+                        });
+                      }
                       Navigator.pop(context, region);
                     },
                   );
