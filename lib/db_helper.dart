@@ -3,6 +3,24 @@ import 'package:path/path.dart';
 import 'dart:io';
 
 class DBHelper {
+  // username 또는 email로 사용자 조회 (닉네임 표시용)
+  static Future<Map<String, dynamic>?> getUserByUsernameOrEmail(
+      String value) async {
+    final db = await DBHelper.database();
+    int? idValue = int.tryParse(value);
+    final result = await db.query(
+      'users',
+      where: idValue != null
+          ? 'username = ? OR email = ? OR id = ?'
+          : 'username = ? OR email = ?',
+      whereArgs: idValue != null ? [value, value, idValue] : [value, value],
+    );
+    if (result.isNotEmpty) {
+      return result.first;
+    }
+    return null;
+  }
+
   // 아이디(username)로 로그인
   static Future<Map<String, dynamic>?> loginUserByUsername(
       String username, String password) async {

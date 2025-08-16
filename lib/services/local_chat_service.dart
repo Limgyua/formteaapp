@@ -81,31 +81,35 @@ class ChatService {
   }
 
   // 채팅방 생성 또는 가져오기
-  String getChatRoomId(String userId, String sellerId, String itemId) {
-    // 모든 사용자가 같은 상품에 대해서는 같은 채팅방을 사용
-    // 상품 ID를 기준으로 채팅방 생성
-    final chatRoomId = 'item_${itemId}_chat';
+  // 1:1 계정 기준 채팅방 ID 생성
+  String getChatRoomId(String email, String otherEmail, String itemId) {
+    // 두 email을 정렬해서 항상 같은 채팅방 ID 생성, 상품ID도 포함
+    List<String> users = [email, otherEmail];
+    users.sort();
+    final chatRoomId = 'chat_${itemId}_${users[0]}_${users[1]}';
     print(
-        'getChatRoomId: userId=$userId, sellerId=$sellerId, itemId=$itemId → chatRoomId=$chatRoomId');
+        'getChatRoomId: email=$email, otherEmail=$otherEmail, itemId=$itemId → chatRoomId=$chatRoomId');
     return chatRoomId;
   }
 
   // 메시지 전송
   Future<void> sendMessage({
     required String chatRoomId,
-    required String senderId,
+    required String senderEmail,
     required String senderName,
     required String message,
     required Map<String, dynamic> itemInfo,
+    required String otherEmail,
   }) async {
     await _initialize(); // 초기화
 
     final messageData = {
-      'senderId': senderId,
+      'senderId': senderEmail,
       'senderName': senderName,
       'message': message,
       'timestamp': DateTime.now(),
       'type': 'text',
+      'readBy': [senderEmail], // 보낸 사람은 바로 읽음 처리
     };
 
     if (!_localMessages.containsKey(chatRoomId)) {
@@ -114,7 +118,7 @@ class ChatService {
     _localMessages[chatRoomId]!.add(messageData);
 
     _localChatRooms[chatRoomId] = {
-      'participants': [senderId, itemInfo['sellerId']],
+      'participants': [senderEmail, otherEmail],
       'lastMessage': message,
       'lastMessageTime': DateTime.now(),
       'itemInfo': itemInfo,
@@ -125,6 +129,27 @@ class ChatService {
 
     // 스트림 업데이트
     _messageController.add(chatRoomId);
+  }
+
+  // 해당 채팅방의 모든 메시지를 내 이메일 기준으로 읽음 처리
+  Future<void> markMessagesAsRead(String chatRoomId, String myEmail) async {
+    await _initialize();
+    final messages = _localMessages[chatRoomId];
+    if (messages == null) return;
+    bool updated = false;
+    for (final msg in messages) {
+      if (!(msg['readBy'] is List)) {
+        msg['readBy'] = [];
+      }
+      if (!(msg['readBy'] as List).contains(myEmail)) {
+        (msg['readBy'] as List).add(myEmail);
+        updated = true;
+      }
+    }
+    if (updated) {
+      await _saveData();
+      _messageController.add(chatRoomId);
+    }
   }
 
   // 메시지 실시간 스트림
@@ -143,13 +168,12 @@ class ChatService {
   }
 
   // 사용자의 채팅방 목록 가져오기
-  Stream<List<Map<String, dynamic>>> getUserChatRooms(String userId) async* {
+  Stream<List<Map<String, dynamic>>> getUserChatRooms(String email) async* {
     await _initialize(); // 초기화
 
     // 초기 데이터 제공
     final initialRooms = _localChatRooms.entries
-        .where(
-            (entry) => (entry.value['participants'] as List).contains(userId))
+        .where((entry) => (entry.value['participants'] as List).contains(email))
         .map((entry) => {
               'id': entry.key,
               ...entry.value,
@@ -163,7 +187,7 @@ class ChatService {
     await for (final _ in _messageController.stream) {
       final rooms = _localChatRooms.entries
           .where(
-              (entry) => (entry.value['participants'] as List).contains(userId))
+              (entry) => (entry.value['participants'] as List).contains(email))
           .map((entry) => {
                 'id': entry.key,
                 ...entry.value,
@@ -179,5 +203,16 @@ class ChatService {
   Future<Map<String, dynamic>?> getChatRoomInfo(String chatRoomId) async {
     await _initialize(); // 초기화
     return _localChatRooms[chatRoomId];
+  }
+
+  // 모든 채팅 데이터 초기화
+  static Future<void> clearAllChatData() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('chat_messages');
+    await prefs.remove('chat_rooms');
+    _localMessages.clear();
+    _localChatRooms.clear();
+    _messageController.add('refresh');
+    print('모든 채팅 데이터가 초기화되었습니다.');
   }
 }

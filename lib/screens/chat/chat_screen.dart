@@ -5,11 +5,13 @@ import '../../global.dart';
 class ChatScreen extends StatefulWidget {
   final Map<String, dynamic> item;
   final String sellerName;
+  final String? otherUserId;
 
   const ChatScreen({
     super.key,
     required this.item,
     required this.sellerName,
+    this.otherUserId,
   });
 
   @override
@@ -17,13 +19,24 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+  // 항상 '상대방'의 email을 정확히 추출
+  String get _otherEmail {
+    // 1. 채팅방 진입 시 전달된 otherUserId(상대방) → 2. author(판매자, 본인 제외) → 3. participants에서 나를 제외한 값(추후 확장)
+    if (widget.otherUserId != null && widget.otherUserId != _currentEmail)
+      return widget.otherUserId!;
+    if (widget.item['author'] != null && widget.item['author'] != _currentEmail)
+      return widget.item['author'];
+    // fallback: 본인 외의 값이 없으면 '상대방@email.com' (실제 서비스에서는 participants에서 추출 필요)
+    return '상대방@email.com';
+  }
+
   final TextEditingController _messageController = TextEditingController();
   final ChatService _chatService = ChatService();
-  String get _currentUserId {
-    final id = userId.value ?? 'anonymous';
+  String get _currentEmail {
+    final email = userEmail.value ?? 'anonymous@email.com';
     print(
-        '_currentUserId getter called - userId.value: ${userId.value}, returning: $id');
-    return id;
+        '_currentEmail getter called - userEmail.value: \\${userEmail.value}, returning: \\$email');
+    return email;
   }
 
   @override
@@ -31,17 +44,22 @@ class _ChatScreenState extends State<ChatScreen> {
     super.initState();
     // 채팅방 ID 생성 (build 시점에서 동적으로 생성)
     print(
-        'ChatScreen initState - currentUserId: $_currentUserId, userId.value: ${userId.value}');
+        'ChatScreen initState - currentEmail: $_currentEmail, userId.value: ${userId.value}');
+    // 채팅방 진입 시 읽음 처리
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _chatService.markMessagesAsRead(_chatRoomId, _currentEmail);
+    });
   }
 
   String get _chatRoomId {
+    final itemId = widget.item['id']?.toString() ?? 'item_001';
     final chatRoomId = _chatService.getChatRoomId(
-      _currentUserId,
-      widget.item['author'] ?? 'seller_001',
-      widget.item['id']?.toString() ?? 'item_001',
+      _currentEmail,
+      _otherEmail,
+      itemId,
     );
     print(
-        '_chatRoomId 생성: currentUserId=$_currentUserId, author=${widget.item['author']}, itemId=${widget.item['id']}, chatRoomId=$chatRoomId');
+        '_chatRoomId 생성: currentEmail=$_currentEmail, otherEmail=$_otherEmail, itemId=$itemId, chatRoomId=$chatRoomId');
     return chatRoomId;
   }
 
@@ -52,17 +70,17 @@ class _ChatScreenState extends State<ChatScreen> {
     _messageController.clear();
 
     print(
-        '_sendMessage - currentUserId: $_currentUserId, userName: ${userName.value}');
+        '_sendMessage - currentEmail: $_currentEmail, userName: \\${userName.value}');
 
     try {
       await _chatService.sendMessage(
         chatRoomId: _chatRoomId,
-        senderId: _currentUserId,
-        senderName: userName.value ?? _currentUserId,
+        senderEmail: _currentEmail,
+        senderName: userName.value ?? _currentEmail,
         message: message,
         itemInfo: {
           'itemId': widget.item['id']?.toString() ?? 'item_001',
-          'sellerId': widget.item['author'] ?? 'seller_001',
+          'sellerId': widget.item['author'] ?? 'seller@email.com',
           'title': widget.item['title'] ?? '',
           'price': widget.item['price'] ?? 0,
           'images': widget.item['images'] != null &&
@@ -70,6 +88,7 @@ class _ChatScreenState extends State<ChatScreen> {
               ? [widget.item['images'][0].path]
               : [],
         },
+        otherEmail: _otherEmail,
       );
     } catch (e) {
       print('Error sending message: $e');
@@ -111,8 +130,9 @@ class _ChatScreenState extends State<ChatScreen> {
                       color: Colors.black,
                     ),
                   ),
+                  // 상대방 id(구매자면 판매자, 판매자면 구매자) 고정 표시
                   Text(
-                    widget.sellerName,
+                    widget.otherUserId ?? widget.item['author'] ?? '상대방',
                     style: TextStyle(
                       fontSize: 12,
                       color: Colors.grey[600],
@@ -187,7 +207,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         style: TextStyle(
                           color: _getFormattedPrice() == '나눔'
                               ? Colors.green
-                              : Colors.orange[700],
+                              : Colors.black,
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
                         ),
@@ -228,13 +248,13 @@ class _ChatScreenState extends State<ChatScreen> {
                   itemCount: messages.length,
                   itemBuilder: (context, index) {
                     final messageData = messages[index];
-                    final isMe = messageData['senderId'] == _currentUserId;
+                    final isMe = messageData['senderId'] == _currentEmail;
 
                     // 상세 디버그 출력
                     print('=== 메시지 정렬 디버그 #$index ===');
                     print(
                         'messageData[senderId]: "${messageData['senderId']}"');
-                    print('_currentUserId: "$_currentUserId"');
+                    print('_currentEmail: "$_currentEmail"');
                     print('userId.value: "${userId.value}"');
                     print('isMe 결과: $isMe');
                     print('메시지 내용: "${messageData['message']}"');
@@ -251,7 +271,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           maxWidth: MediaQuery.of(context).size.width * 0.75,
                         ),
                         decoration: BoxDecoration(
-                          color: isMe ? Colors.orange : Colors.white,
+                          color: isMe ? Colors.black : Colors.white,
                           borderRadius: BorderRadius.circular(18),
                           boxShadow: [
                             BoxShadow(
@@ -284,14 +304,43 @@ class _ChatScreenState extends State<ChatScreen> {
                               ),
                             ),
                             const SizedBox(height: 4),
-                            Text(
-                              _formatLocalTime(messageData['timestamp']),
-                              style: TextStyle(
-                                color: isMe
-                                    ? Colors.white.withOpacity(0.8)
-                                    : Colors.grey[600],
-                                fontSize: 12,
-                              ),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  _formatLocalTime(messageData['timestamp']),
+                                  style: TextStyle(
+                                    color: isMe
+                                        ? Colors.white.withOpacity(0.8)
+                                        : Colors.grey[600],
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                // 안읽은 메시지 뱃지 (상대방 메시지이면서 내가 안읽은 경우만)
+                                if (!isMe &&
+                                    (!(messageData['readBy'] is List) ||
+                                        !(messageData['readBy'] as List)
+                                            .contains(_currentEmail))) ...[
+                                  const SizedBox(width: 6),
+                                  Container(
+                                    width: 18,
+                                    height: 18,
+                                    decoration: BoxDecoration(
+                                      color: Colors.red,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: const Text(
+                                      '1',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ],
                             ),
                           ],
                         ),
@@ -340,7 +389,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 const SizedBox(width: 8),
                 Container(
                   decoration: const BoxDecoration(
-                    color: Colors.orange,
+                    color: Colors.black,
                     shape: BoxShape.circle,
                   ),
                   child: IconButton(

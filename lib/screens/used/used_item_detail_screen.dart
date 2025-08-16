@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
 import '../chat/chat_screen.dart';
+import '../chat/chat_list_screen.dart';
+import '../../global.dart';
 import '../../db_helper.dart';
 
 class UsedItemDetailScreen extends StatelessWidget {
@@ -162,8 +164,7 @@ class UsedItemDetailScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color:
-                          priceText == '나눔' ? Colors.green : Colors.orange[700],
+                      color: priceText == '나눔' ? Colors.green : Colors.black,
                     ),
                   ),
 
@@ -300,47 +301,83 @@ class UsedItemDetailScreen extends StatelessWidget {
 
             const SizedBox(width: 12),
 
-            // 채팅하기 버튼
+            // 판매자일 때 '채팅보기' 버튼, 구매자일 때 '채팅하기' 버튼
             Expanded(
-              child: ElevatedButton(
-                onPressed: () async {
-                  // 판매자 정보 조회
-                  String sellerName = item['author'] ?? '익명';
-                  if (item['author'] != null) {
-                    final sellerInfo =
-                        await DBHelper.getUserByUsername(item['author']);
-                    if (sellerInfo != null) {
-                      sellerName =
-                          sellerInfo['name'] ?? sellerInfo['username'] ?? '익명';
-                    }
-                  }
-
-                  // 채팅 화면으로 이동
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ChatScreen(
-                        item: item,
-                        sellerName: sellerName,
+              child: Builder(
+                builder: (context) {
+                  final myId = userId.value;
+                  final sellerId = item['author'];
+                  if (myId != null && myId == sellerId) {
+                    // 판매자라면 '채팅보기' 버튼
+                    return ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ChatListScreen(
+                              filterItemId: item['id']?.toString(),
+                            ),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.black,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
-                    ),
-                  );
+                      child: const Text(
+                        '채팅보기',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    );
+                  } else {
+                    // 구매자라면 기존 '채팅하기' 버튼
+                    return ElevatedButton(
+                      onPressed: () async {
+                        String sellerName = item['author'] ?? '익명';
+                        if (item['author'] != null) {
+                          final sellerInfo =
+                              await DBHelper.getUserByUsername(item['author']);
+                          if (sellerInfo != null) {
+                            sellerName = sellerInfo['name'] ??
+                                sellerInfo['username'] ??
+                                '익명';
+                          }
+                        }
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ChatScreen(
+                              item: item,
+                              sellerName: sellerName,
+                            ),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.black,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: const Text(
+                        '채팅하기',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    );
+                  }
                 },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: const Text(
-                  '채팅하기',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
               ),
             ),
           ],

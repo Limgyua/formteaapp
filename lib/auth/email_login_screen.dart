@@ -131,13 +131,25 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                         if (user != null) {
                           print('로그인 성공 - user data: $user');
                           isLoggedIn.value = true;
-                          userName.value = user['name'];
+                          // 이름이 없으면 username, 그것도 없으면 email 사용
+                          if (user['name'] != null &&
+                              user['name'].toString().isNotEmpty) {
+                            userName.value = user['name'];
+                          } else if (user['username'] != null &&
+                              user['username'].toString().isNotEmpty) {
+                            userName.value = user['username'];
+                          } else {
+                            userName.value = user['email'];
+                          }
                           // username이 비어있으면 email을 사용
                           userId.value = (user['username'] != null &&
                                   user['username'].toString().isNotEmpty)
                               ? user['username']
                               : user['email'];
-                          print('userId.value 설정 완료: ${userId.value}');
+                          // 이메일 글로벌 변수에 저장
+                          userEmail.value = user['email'];
+                          print(
+                              'userId.value 설정 완료: ${userId.value}, userEmail.value: ${userEmail.value}');
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(content: Text('${user['name']}님, 환영합니다!')),
                           );

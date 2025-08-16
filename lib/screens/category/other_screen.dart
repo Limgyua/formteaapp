@@ -145,10 +145,8 @@ class _OtherScreenState extends State<OtherScreen> {
                                   style: const TextStyle(
                                       color: Colors.black54, fontSize: 13)),
                             Text(priceText,
-                                style: TextStyle(
-                                    color: priceText == '나눔'
-                                        ? Colors.green
-                                        : Colors.grey[700],
+                                style: const TextStyle(
+                                    color: Colors.black,
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16)),
                           ],

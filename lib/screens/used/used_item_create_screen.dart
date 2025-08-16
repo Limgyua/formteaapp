@@ -13,6 +13,38 @@ class UsedItemCreateScreen extends StatefulWidget {
 }
 
 class _UsedItemCreateScreenState extends State<UsedItemCreateScreen> {
+  @override
+  void initState() {
+    super.initState();
+    priceController.addListener(_formatPriceInput);
+  }
+
+  void _formatPriceInput() {
+    final text = priceController.text.replaceAll(',', '');
+    if (text.isEmpty) return;
+    // 숫자가 아니면 리턴
+    if (int.tryParse(text) == null) return;
+    final formatted = _addCommaToNumber(text);
+    if (priceController.text != formatted) {
+      final selectionIndex = formatted.length -
+          (priceController.text.length - priceController.selection.end);
+      priceController.value = TextEditingValue(
+        text: formatted,
+        selection: TextSelection.collapsed(
+            offset: selectionIndex < 0 ? 0 : selectionIndex),
+      );
+    }
+  }
+
+  String _addCommaToNumber(String value) {
+    final number = int.tryParse(value);
+    if (number == null) return value;
+    return number.toString().replaceAllMapped(
+          RegExp(r'\B(?=(\d{3})+(?!\d))'),
+          (match) => ',',
+        );
+  }
+
   String productState = '중고상품';
   String category = '가구';
   final TextEditingController titleController = TextEditingController();
@@ -574,6 +606,12 @@ class _UsedItemCreateScreenState extends State<UsedItemCreateScreen> {
                       ),
                       contentPadding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 16),
+                      suffixText: '원',
+                      suffixStyle: const TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                     ),
                   ),
             const SizedBox(height: 20),
@@ -637,8 +675,9 @@ class _UsedItemCreateScreenState extends State<UsedItemCreateScreen> {
                   }
 
                   try {
-                    final priceText =
-                        dealType == '나눔하기' ? '' : priceController.text.trim();
+                    final priceText = dealType == '나눔하기'
+                        ? ''
+                        : priceController.text.replaceAll(',', '').trim();
                     final item = {
                       'title': titleController.text.trim(),
                       'content': contentController.text.trim(),

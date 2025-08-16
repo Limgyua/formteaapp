@@ -97,7 +97,7 @@ class _PetScreenState extends State<PetScreen> {
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                     child: const Icon(Icons.pets,
-                                        color: Colors.amber, size: 32),
+                                        color: Color.fromARGB(255, 0, 0, 0), size: 32),
                                   ),
                         title: Row(
                           children: [
